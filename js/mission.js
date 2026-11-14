@@ -58,8 +58,18 @@ function log(text, kind = "") {
 }
 
 // If a drawing is missing, show a dashed box with its name instead.
+// Pictures can be .png or .jpg: if "x.png" isn't there, try "x.jpg" once.
+function tryJpg(img) {
+  const src = img.getAttribute("src") || "";
+  if (!src.endsWith(".png") || img.dataset.triedJpg) return false;
+  img.dataset.triedJpg = "1";
+  img.src = src.replace(/\.png$/, ".jpg");
+  return true;
+}
+
 function useDrawingOrPlaceholder(img) {
   const swap = () => {
+    if (tryJpg(img)) return;
     const box = document.createElement("div");
     box.className = "placeholder";
     box.textContent = img.dataset.label;
@@ -242,7 +252,8 @@ function startSurface() {
     spot.innerHTML = `<span class="spot-label">${s.label}</span><span class="spot-bar"></span>`;
     const img = document.createElement("img");
     img.alt = s.label;
-    img.onload = () => spot.querySelector(".spot-label").replaceWith(img);
+    img.onload = () => spot.querySelector(".spot-label")?.replaceWith(img);
+    img.onerror = () => tryJpg(img);
     img.src = s.drawing;
     spot.onclick = () => collect(spot, kind);
     box.append(spot);
