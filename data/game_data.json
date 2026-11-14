@@ -1,0 +1,13 @@
+{
+  "source": "NASA Planetary Fact Sheet",
+  "source_url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+  "rules": {
+    "fuel": "gravity (m/s^2) x 10  -> stronger gravity = more fuel",
+    "food": "distance from Sun in AU x 10  -> farther = more food (1 AU = 149.6 million km)"
+  },
+  "levels": [
+    { "level": 1, "planet": "Moon",    "distance": 149.6, "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
+    { "level": 2, "planet": "Mars",    "distance": 228.0, "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
+    { "level": 3, "planet": "Jupiter", "distance": 778.5, "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
+  ]
+}
