@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NASA Mission</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="top">
+    <span id="mission-name">Loading…</span>
+    <span class="clock" id="clock">T+ 00:00:00</span>
+  </header>
+
+  <main>
+
+    <!-- The trip: Earth on the left, the planet on the right, the rocket in between -->
+    <section class="trip">
+      <div class="body earth">
+        <img src="assets/earth.png" alt="Earth" data-label="Earth drawing">
+      </div>
+      <div class="path">
+        <div class="rocket" id="rocket">
+          <img src="assets/rocket.png" alt="Rocket" data-label="Rocket drawing">
+        </div>
+      </div>
+      <div class="body planet" id="planet-slot"></div>
+    </section>
+
+    <!-- PHASE 1: briefing -->
+    <section class="panel" id="phase-brief">
+      <h2 id="brief-title"></h2>
+      <dl class="facts" id="brief-facts"></dl>
+      <p id="brief-goal"></p>
+      <button class="go" id="to-load">Load the rocket</button>
+    </section>
+
+    <!-- PHASE 2: load fuel and food -->
+    <section class="panel" id="phase-load" hidden>
+      <h2>Load the rocket</h2>
+      <p class="hint" id="budget-text"></p>
+
+      <div class="load-row">
+        <div>
+          <strong>Fuel</strong>
+          <p class="hint" id="fuel-hint"></p>
+        </div>
+        <div class="stepper" data-key="fuel">
+          <button data-step="-5">−5</button><button data-step="-1">−1</button>
+          <output id="load-fuel">0</output>
+          <button data-step="1">+1</button><button data-step="5">+5</button>
+        </div>
+      </div>
+
+      <div class="load-row">
+        <div>
+          <strong>Food</strong>
+          <p class="hint" id="food-hint"></p>
+        </div>
+        <div class="stepper" data-key="food">
+          <button data-step="-5">−5</button><button data-step="-1">−1</button>
+          <output id="load-food">0</output>
+          <button data-step="1">+1</button><button data-step="5">+5</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="ghost" id="back-brief">Back</button>
+        <button class="go" id="launch">Launch</button>
+      </div>
+    </section>
+
+    <!-- PHASE 3: flying + landing (gauges) -->
+    <section class="panel" id="phase-fly" hidden>
+      <div class="gauges">
+        <div class="gauge">
+          <div class="gauge-head"><span>Fuel</span><span id="fuel-num"></span></div>
+          <div class="bar"><div class="fill fuel" id="fuel-bar"></div></div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-head"><span>Food</span><span id="food-num"></span></div>
+          <div class="bar"><div class="fill food" id="food-bar"></div></div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-head"><span>Distance left</span><span id="dist-num"></span></div>
+          <div class="bar"><div class="fill dist" id="dist-bar"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 4: result -->
+    <section class="panel" id="phase-result" hidden>
+      <h2 id="result-title"></h2>
+      <p id="result-text"></p>
+      <div class="row">
+        <button class="go" id="result-btn"></button>
+      </div>
+    </section>
+
+    <!-- Mission log: every step of the mission is written here -->
+    <section class="log-box">
+      <h3>Mission log</h3>
+      <ol class="log" id="log"></ol>
+    </section>
+
+  </main>
+
+  <script src="js/mission.js"></script>
+</body>
+</html>

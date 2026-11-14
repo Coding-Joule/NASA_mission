@@ -1,0 +1,140 @@
+:root {
+  --space:  #070b1a;
+  --panel:  #111833;
+  --text:   #e9eefc;
+  --dim:    #8f9bc2;
+  --fuel:   #ff8a3d;
+  --food:   #6fd38f;
+  --dist:   #7fb2ff;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--space);
+  color: var(--text);
+  font: 16px/1.5 system-ui, "Segoe UI", sans-serif;
+}
+
+main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 24px; }
+
+/* top bar */
+.top {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--panel);
+  font-weight: 600;
+}
+.levels { display: flex; gap: 8px; }
+.levels button {
+  font: inherit; font-size: 14px;
+  padding: 6px 12px;
+  color: var(--text); background: transparent;
+  border: 1px solid var(--dim); border-radius: 6px;
+  cursor: pointer;
+}
+.levels button.on { background: var(--text); color: var(--space); }
+
+/* the trip */
+.trip {
+  display: grid;
+  grid-template-columns: 90px 1fr 140px;
+  align-items: center;
+  gap: 8px;
+  min-height: 200px;
+}
+.body img, .rocket img { width: 100%; display: block; }
+.path {
+  position: relative;
+  height: 80px;
+  border-top: 2px dashed rgba(233, 238, 252, 0.25);
+  margin-top: 40px;
+}
+.rocket {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 80px;
+  transform: translateX(-50%);
+}
+
+/* placeholder shown until a drawing is added */
+.placeholder {
+  display: grid; place-items: center;
+  aspect-ratio: 1;
+  border: 2px dashed var(--dim);
+  border-radius: 8px;
+  color: var(--dim);
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+}
+
+/* gauges */
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.gauge { background: var(--panel); padding: 12px 14px; border-radius: 8px; }
+.gauge-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; margin-bottom: 8px; }
+.gauge-head span:last-child { font-variant-numeric: tabular-nums; }
+.bar { height: 12px; background: rgba(255, 255, 255, 0.08); border-radius: 6px; overflow: hidden; }
+.fill { height: 100%; width: 100%; }
+.fill.fuel { background: var(--fuel); }
+.fill.food { background: var(--food); }
+.fill.dist { background: var(--dist); }
+
+.status { margin: 0; min-height: 1.5em; color: var(--dim); }
+
+.go {
+  justify-self: start;
+  font: 700 18px system-ui, sans-serif;
+  padding: 12px 28px;
+  color: var(--space); background: var(--fuel);
+  border: 0; border-radius: 8px;
+  cursor: pointer;
+}
+.go:disabled { opacity: 0.4; cursor: default; }
+
+/* mission clock */
+.clock { font-family: Consolas, "Courier New", monospace; color: var(--food); font-variant-numeric: tabular-nums; }
+
+/* phase panels */
+.panel { display: grid; gap: 14px; background: var(--panel); padding: 20px; border-radius: 10px; }
+.panel h2 { margin: 0; font-size: 26px; }
+.panel p { margin: 0; }
+.hint { color: var(--dim); font-size: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.good { color: var(--food); }
+.bad  { color: #ff6b7a; }
+
+.facts { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.facts div { background: rgba(255, 255, 255, 0.04); padding: 10px 12px; border-radius: 8px; }
+.facts dt { color: var(--dim); font-size: 13px; }
+.facts dd { margin: 0; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* loading fuel and food */
+.load-row {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.load-row > div:first-child { min-width: 0; flex: 1 1 260px; }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper button, .ghost {
+  font: 600 14px system-ui, sans-serif;
+  padding: 8px 12px;
+  color: var(--text); background: transparent;
+  border: 1px solid var(--dim); border-radius: 6px;
+  cursor: pointer;
+}
+.stepper output { min-width: 3ch; text-align: center; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* mission log */
+.log-box h3 { margin: 0 0 8px; font-size: 14px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.log .t { color: var(--dim); font-family: Consolas, "Courier New", monospace; margin-right: 6px; }
+
+@media (max-width: 560px) {
+  .trip { grid-template-columns: 60px 1fr 80px; }
+  .rocket { width: 56px; }
+}
