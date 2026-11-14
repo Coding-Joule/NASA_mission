@@ -73,6 +73,7 @@
 
     <!-- PHASE 3: flying + landing (gauges) -->
     <section class="panel" id="phase-fly" hidden>
+      <p class="fly-day" id="fly-day"></p>
       <div class="gauges">
         <div class="gauge">
           <div class="gauge-head"><span>Fuel</span><span id="fuel-num"></span></div>
@@ -120,6 +121,14 @@
       <h3>Mission log</h3>
       <ol class="log" id="log"></ol>
     </section>
+
+    <footer class="sources">
+      Data:
+      <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener">NASA Planetary Fact Sheet</a>
+      (gravity, temperature, distances) ·
+      <a href="https://nasa.github.io/mission-viz/RMarkdown/ontology_based_orrery_generated_from_R_code.html" target="_blank" rel="noopener">NASA Mission Viz orbital parameters</a>
+      (orbit sizes and years, used for food and trip days)
+    </footer>
 
   </main>
 

@@ -11,10 +11,23 @@ const $ = (id) => document.getElementById(id);
 // Backup copy of data/game_data.json, used if the file can't load
 // (for example when index.html is opened by double-clicking).
 const BACKUP_LEVELS = [
-  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
-  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
-  { level: 3, minutes: 1, planet: "Jupiter", distance: 778.5, from_earth: 628.9, gravity: 23.1, temperature: -110, fuel: 231, food: 52 },
+  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
+  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
+  { level: 3, minutes: 1, planet: "Jupiter", distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 23.1, temperature: -110, fuel: 231, food: 52 },
 ];
+const BACKUP_EARTH = { sma_au: 1.0, period_days: 365.25638 };
+
+// Real trip time to a planet, in days, using NASA Mission Viz orbit data.
+// A Hohmann transfer is the usual fuel-saving path between two orbits:
+// it takes half an orbit around the Sun whose size is halfway between
+// Earth's orbit and the planet's. Kepler's third law gives that orbit's
+// length: (size in AU)^1.5 Earth-years.
+function hohmannDays(planetAU, earth) {
+  const transferAU = (earth.sma_au + planetAU) / 2;
+  return 0.5 * Math.pow(transferAU, 1.5) * earth.period_days;
+}
+
+let earth = BACKUP_EARTH;
 
 const BUDGET = 100;          // mission points to split between fuel and food
 const BASE_SECONDS = 2;      // trip time on screen: 2 s + 1 s per 120 million km
@@ -108,6 +121,8 @@ function startBriefing() {
   $("brief-title").textContent = `Mission ${m.level}: Land on ${m.planet}`;
   $("brief-facts").innerHTML = [
     ["Distance from Earth", `${m.from_earth} million km`],
+    ["Distance from Sun", `${m.sma_au} AU`],
+    ["Trip time", `${m.trip_days} days`],
     ["Gravity", `${m.gravity} m/s²`],
     ["Mean temperature", `${m.temperature} °C`],
   ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
@@ -127,8 +142,8 @@ function startLoad() {
   $("fuel-hint").textContent =
     `Landing burns 10 fuel for every 1 m/s² of gravity. ${m.planet}'s gravity is ${m.gravity} m/s².`;
   $("food-hint").textContent =
-    `The crew eats 10 food for every 149.6 million km of the planet's distance from the Sun. ` +
-    `${m.planet} is ${m.distance} million km from the Sun.`;
+    `The crew eats 10 food for every 1 AU of the planet's distance from the Sun. ` +
+    `${m.planet} is ${m.sma_au} AU from the Sun, and the trip takes ${m.trip_days} days.`;
   updateLoad();
   showPhase("load");
 }
@@ -174,22 +189,24 @@ function launch() {
     const progress = Math.min((now - start) / duration, foodLastsUntil);
     const foodLeft = load.food - m.food * progress;
     drawGauges(load.fuel, foodLeft, m.from_earth * (1 - progress));
+    drawDay(progress, m.trip_days);
     moveRocket(progress);
 
     if (!halfwayLogged && progress >= 0.5) {
       halfwayLogged = true;
-      log(`Halfway there. ${Math.round(foodLeft)} food left.`);
+      log(`Day ${Math.round(m.trip_days / 2)}: halfway there. ${Math.round(foodLeft)} food left.`);
     }
 
     if (progress < foodLastsUntil) return requestAnimationFrame(frame);
 
     if (foodLastsUntil < 1) {
       const kmLeft = (m.from_earth * (1 - progress)).toFixed(1);
-      log(`Out of food with ${kmLeft} million km to go.`, "bad");
-      return endMission(false, `Your crew ran out of food ${kmLeft} million km from ${m.planet}. ` +
-        `This trip needs ${m.food} food; you packed ${load.food}.`);
+      const day = Math.max(1, Math.round(m.trip_days * progress));
+      log(`Day ${day}: out of food with ${kmLeft} million km to go.`, "bad");
+      return endMission(false, `On day ${day} of ${m.trip_days}, your crew ran out of food ` +
+        `${kmLeft} million km from ${m.planet}. This trip needs ${m.food} food; you packed ${load.food}.`);
     }
-    log(`Arrived at ${m.planet}. Starting landing burn.`);
+    log(`Day ${m.trip_days}: arrived at ${m.planet}. Starting landing burn.`);
     land(load.food - m.food);
   }
   requestAnimationFrame(frame);
@@ -336,6 +353,7 @@ function flyHome(passed, report) {
     const t = Math.min((now - start) / duration, 1);
     const progress = 1 - t;                       // 1 = at the planet, 0 = back at Earth
     drawGauges(left.fuel, left.food, m.from_earth * progress);
+    drawDay(t, m.trip_days, "home");
     moveRocket(progress, 0, true);
     if (t < 1) return requestAnimationFrame(frame);
 
@@ -343,6 +361,14 @@ function flyHome(passed, report) {
     endMission(passed, report);
   }
   requestAnimationFrame(frame);
+}
+
+// "Day 130 of 259" during a flight
+function drawDay(progress, tripDays, where = "out") {
+  const day = Math.min(tripDays, Math.max(1, Math.ceil(tripDays * progress)));
+  $("fly-day").textContent = where === "home"
+    ? `Flying home · Day ${day} of ${tripDays}`
+    : `Day ${day} of ${tripDays}`;
 }
 
 function drawGauges(fuel, food, km) {
@@ -414,10 +440,11 @@ async function loadLevels() {
   try {
     const res = await fetch("data/game_data.json");
     if (!res.ok) throw new Error(res.status);
-    return (await res.json()).levels;
+    const json = await res.json();
+    return { levels: json.levels, earth: json.earth };
   } catch (err) {
     console.warn("Using backup numbers:", err);
-    return BACKUP_LEVELS;
+    return { levels: BACKUP_LEVELS, earth: BACKUP_EARTH };
   }
 }
 
@@ -427,6 +454,11 @@ $("back-brief").onclick = () => showPhase("brief");
 $("launch").onclick = launch;
 
 loadLevels().then((data) => {
-  levels = data;
+  earth = data.earth;
+  levels = data.levels;
+  // planets: work out the real trip time from the Mission Viz orbit numbers
+  levels.forEach((m) => {
+    if (!m.trip_days) m.trip_days = Math.round(hohmannDays(m.sma_au, earth));
+  });
   startBriefing();
 });

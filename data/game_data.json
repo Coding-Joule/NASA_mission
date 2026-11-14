@@ -1,15 +1,24 @@
 {
-  "source": "NASA Planetary Fact Sheet",
-  "source_url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+  "sources": [
+    { "name": "NASA Planetary Fact Sheet", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+      "used_for": "gravity, temperature, distance in million km, Moon's distance from Earth" },
+    { "name": "NASA Mission Viz: orbital parameters table", "url": "https://nasa.github.io/mission-viz/RMarkdown/ontology_based_orrery_generated_from_R_code.html",
+      "used_for": "sma_au (distance from the Sun in AU) and period_days (length of a year), used for food and real trip times" }
+  ],
   "rules": {
     "fuel": "gravity (m/s^2) x 10  -> stronger gravity = more fuel",
-    "food": "distance from Sun in AU x 10  -> farther = more food (1 AU = 149.6 million km)",
+    "food": "sma_au (distance from Sun in AU, Mission Viz) x 10  -> farther = more food",
+    "trip_days": "Hohmann transfer from Earth: 0.5 x ((1 + sma_au) / 2)^1.5 x Earth's period_days. The Moon isn't in the Mission Viz table, so its trip uses the 3 days Apollo crews took.",
     "minutes": "time on the surface to collect information (team idea: 3, 2, 1)",
     "from_earth": "closest distance from Earth in million km (Moon: 0.384 from the fact sheet; planets: their distance from the Sun minus Earth's 149.6)"
   },
+  "earth": { "sma_au": 1.0, "period_days": 365.25638 },
   "levels": [
-    { "level": 1, "minutes": 3, "planet": "Moon",    "distance": 149.6, "from_earth": 0.384, "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
-    { "level": 2, "minutes": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4, "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
-    { "level": 3, "minutes": 1, "planet": "Jupiter", "distance": 778.5, "from_earth": 628.9, "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
+    { "level": 1, "minutes": 3, "planet": "Moon",    "distance": 149.6, "from_earth": 0.384, "sma_au": 1.0,      "period_days": null,    "trip_days": 3,
+      "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
+    { "level": 2, "minutes": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4,  "sma_au": 1.523679, "period_days": 686.971,
+      "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
+    { "level": 3, "minutes": 1, "planet": "Jupiter", "distance": 778.5, "from_earth": 628.9, "sma_au": 5.2044,   "period_days": 4332.59,
+      "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
   ]
 }

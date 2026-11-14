@@ -194,6 +194,13 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 }
 @keyframes stamp { from { transform: rotate(-4deg) scale(1.8); opacity: 0; } }
 
+/* flight day counter */
+.fly-day { margin: 0; font: 700 22px Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums; }
+
+/* data sources */
+.sources { font-size: 13px; color: var(--dim); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; }
+.sources a { color: var(--dist); }
+
 /* mission log */
 .log-box h3 { margin: 0 0 8px; font-size: 14px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
 .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
