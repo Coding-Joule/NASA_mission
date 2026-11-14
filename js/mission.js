@@ -78,9 +78,10 @@ function setPlanetPicture(name) {
   $("planet-slot").replaceChildren(img);
 }
 
-function moveRocket(progress, down = 0) {
+function moveRocket(progress, down = 0, home = false) {
   $("rocket").style.left = `${progress * 100}%`;
-  $("rocket").style.transform = `translateX(-50%) translateY(${down}px) rotate(${down ? 90 : 0}deg)`;
+  $("rocket").style.transform =
+    `translateX(-50%) translateY(${down}px) rotate(${down ? 90 : 0}deg) scaleX(${home ? -1 : 1})`;
 }
 
 // ---------- 1. briefing ----------
@@ -205,6 +206,7 @@ function land(foodLeft) {
         `Landing on ${m.planet} needs ${m.fuel} fuel; you packed ${load.fuel}.`);
     }
     log(`Touchdown on ${m.planet}!`, "good");
+    left = { fuel: fuelLeft, food: foodLeft };
     startSurface();
   }
   requestAnimationFrame(frame);
@@ -300,12 +302,36 @@ function finishSurface() {
 
   if (missing.length) {
     log(`Time's up. Still needed: ${missing.join(", ")}.`, "bad");
-    return endMission(false, `Time ran out on ${m.planet} before you collected enough information ` +
-      `(still needed ${missing.join(", ")}). You're fired.`);
+    return flyHome(false, `You went all the way to ${m.planet} and came back without enough information. ` +
+      `You still needed ${missing.join(", ")}.`);
   }
   log(`All information collected on ${m.planet}!`, "good");
-  endMission(true, `You landed on ${m.planet} and collected every rock, picture and ground sample ` +
+  flyHome(true, `You landed on ${m.planet} and brought back every rock, picture and ground sample, ` +
     `with ${timeLeft} seconds to spare.`);
+}
+
+// ---------- 6. fly home ----------
+
+let left = { fuel: 0, food: 0 };   // what's left in the tanks after landing
+
+function flyHome(passed, report) {
+  const m = mission();
+  log(`Lifting off from ${m.planet}. Heading home to Earth.`);
+  showPhase("fly");
+  const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
+  const start = performance.now();
+
+  function frame(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const progress = 1 - t;                       // 1 = at the planet, 0 = back at Earth
+    drawGauges(left.fuel, left.food, m.from_earth * progress);
+    moveRocket(progress, 0, true);
+    if (t < 1) return requestAnimationFrame(frame);
+
+    log(`Splashdown! Back on Earth. Reporting to the boss.`, "good");
+    endMission(passed, report);
+  }
+  requestAnimationFrame(frame);
 }
 
 function drawGauges(fuel, food, km) {
@@ -318,14 +344,44 @@ function drawGauges(fuel, food, km) {
   $("dist-bar").style.width = `${(km / m.from_earth) * 100}%`;
 }
 
-// ---------- 6. result ----------
+// ---------- 7. the boss decides ----------
+
+// The boss's words. Change these to whatever your team wants.
+const BOSS = {
+  name: "The Boss",
+  keep:  ["Good work.", "You keep your job."],
+  fired: ["That's it.", "YOU'RE FIRED!"],
+};
+
+let typing = null;
 
 function endMission(success, text) {
   clearInterval(clockTimer);
+  clearInterval(surfaceTimer);
   const last = index === levels.length - 1;
-  $("result-title").textContent = success ? "Mission success" : "Mission failed";
-  $("result-title").className = success ? "good" : "bad";
-  $("result-text").textContent = text;
+  const lines = success ? BOSS.keep : BOSS.fired;
+
+  $("boss-name").textContent = BOSS.name;
+  $("result-title").textContent = success ? "Not fired" : "Fired";
+  $("result-title").className = `verdict ${success ? "good" : "bad"}`;
+  $("result-title").hidden = true;
+  $("result-btn").hidden = true;
+
+  // the boss "talks": the words appear one letter at a time
+  const speech = `${text} ${lines.join(" ")}`;
+  const bubble = $("result-text");
+  bubble.textContent = "";
+  clearInterval(typing);
+  let i = 0;
+  typing = setInterval(() => {
+    bubble.textContent = speech.slice(0, ++i);
+    if (i >= speech.length) {
+      clearInterval(typing);
+      $("result-title").hidden = false;
+      $("result-btn").hidden = false;
+    }
+  }, 22);
+  log(success ? `The boss says: you keep your job.` : `The boss says: you're fired.`, success ? "good" : "bad");
 
   const btn = $("result-btn");
   if (!success) {
