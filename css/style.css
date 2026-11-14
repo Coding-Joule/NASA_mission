@@ -55,10 +55,11 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 }
 .rocket {
   position: absolute;
-  top: -40px;
+  top: -1px;          /* centered on the dashed flight path */
   left: 0;
-  width: 80px;
-  transform: translateX(-50%);
+  width: 140px;
+  transform: translate(-50%, -50%);
+  z-index: 1;
 }
 
 /* placeholder shown until a drawing is added */
@@ -227,7 +228,7 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 
 @media (max-width: 560px) {
   .trip { grid-template-columns: 60px 1fr 80px; }
-  .rocket { width: 56px; }
+  .rocket { width: 90px; }
   .boss { grid-template-columns: 1fr; }
   .boss-pic { max-width: 120px; }
   .bubble::before { display: none; }

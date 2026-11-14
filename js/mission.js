@@ -104,7 +104,7 @@ function setPlanetPicture(name) {
 function moveRocket(progress, down = 0, home = false) {
   $("rocket").style.left = `${progress * 100}%`;
   $("rocket").style.transform =
-    `translateX(-50%) translateY(${down}px) rotate(${down ? 90 : 0}deg) scaleX(${home ? -1 : 1})`;
+    `translate(-50%, calc(-50% + ${down}px)) rotate(${down ? 90 : 0}deg) scaleX(${home ? -1 : 1})`;
 }
 
 // ---------- background captions (words live in js/captions.js) ----------
