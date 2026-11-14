@@ -107,6 +107,35 @@ function moveRocket(progress, down = 0, home = false) {
     `translateX(-50%) translateY(${down}px) rotate(${down ? 90 : 0}deg) scaleX(${home ? -1 : 1})`;
 }
 
+// ---------- background captions (words live in js/captions.js) ----------
+
+let captionTimer = null;
+
+function fillIn(text, m) {
+  return text.replace(/\{(\w+)\}/g, (all, key) => (m[key] ?? all));
+}
+
+function setCaptions(part) {
+  const m = mission();
+  const list = [...(CAPTIONS[part] || []), ...(CAPTIONS.planets[m.planet] || [])]
+    .map((t) => fillIn(t, m));
+  const el = $("caption");
+  clearInterval(captionTimer);
+  if (!list.length) { el.textContent = ""; return; }
+
+  let i = 0;
+  const showNext = () => {
+    el.classList.remove("show");
+    setTimeout(() => {
+      el.textContent = list[i % list.length];
+      el.classList.add("show");
+      i += 1;
+    }, 300);
+  };
+  showNext();
+  captionTimer = setInterval(showNext, CAPTION_SECONDS * 1000);
+}
+
 // ---------- 1. briefing ----------
 
 function startBriefing() {
@@ -132,6 +161,7 @@ function startBriefing() {
   $("log").replaceChildren();
   log(`Mission ${m.level} briefing: destination ${m.planet}.`);
   showPhase("brief");
+  setCaptions("brief");
 }
 
 // ---------- 2. load ----------
@@ -146,6 +176,7 @@ function startLoad() {
     `${m.planet} is ${m.sma_au} AU from the Sun, and the trip takes ${m.trip_days} days.`;
   updateLoad();
   showPhase("load");
+  setCaptions("load");
 }
 
 function updateLoad() {
@@ -178,6 +209,7 @@ function launch() {
   log(`Loaded ${load.fuel} fuel and ${load.food} food.`);
   log(`Liftoff! Heading for ${m.planet}.`, "good");
   showPhase("fly");
+  setCaptions("fly");
 
   // food runs out at this point of the trip (1 = makes it all the way)
   const foodLastsUntil = Math.min(load.food / m.food, 1);
@@ -215,6 +247,7 @@ function launch() {
 // ---------- 4. land ----------
 
 function land(foodLeft) {
+  setCaptions("land");
   const m = mission();
   const fuelLastsUntil = Math.min(load.fuel / m.fuel, 1);
   const start = performance.now();
@@ -279,6 +312,7 @@ function startSurface() {
   drawQuota();
   drawTimer();
   showPhase("surface");
+  setCaptions("surface");
   clearInterval(surfaceTimer);
   surfaceTimer = setInterval(() => {
     timeLeft -= 1;
@@ -346,6 +380,7 @@ function flyHome(passed, report) {
   const m = mission();
   log(`Lifting off from ${m.planet}. Heading home to Earth.`);
   showPhase("fly");
+  setCaptions("home");
   const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
   const start = performance.now();
 
@@ -432,6 +467,7 @@ function endMission(success, text) {
     btn.onclick = () => { index = 0; startBriefing(); };
   }
   showPhase("result");
+  setCaptions("boss");
 }
 
 // ---------- start ----------
@@ -450,7 +486,7 @@ async function loadLevels() {
 
 document.querySelectorAll("img[data-label]").forEach(useDrawingOrPlaceholder);
 $("to-load").onclick = startLoad;
-$("back-brief").onclick = () => showPhase("brief");
+$("back-brief").onclick = () => { showPhase("brief"); setCaptions("brief"); };
 $("launch").onclick = launch;
 
 loadLevels().then((data) => {

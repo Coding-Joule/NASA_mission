@@ -194,6 +194,25 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 }
 @keyframes stamp { from { transform: rotate(-4deg) scale(1.8); opacity: 0; } }
 
+/* educational captions behind the space scene */
+.trip { position: relative; padding-bottom: 64px; }
+.caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  margin: 0;
+  min-height: 3em;
+  text-align: center;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--dim);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.caption.show { opacity: 1; }
+.caption::before { content: "Did you know? "; font-style: normal; font-weight: 700; color: var(--dist); }
+.caption:empty::before { content: none; }
+
 /* flight day counter */
 .fly-day { margin: 0; font: 700 22px Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums; }
 
