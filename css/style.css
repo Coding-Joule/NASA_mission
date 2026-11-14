@@ -97,6 +97,14 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 }
 .go:disabled { opacity: 0.4; cursor: default; }
 
+/* intro */
+.intro { gap: 16px; }
+.eyebrow { margin: 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.intro-title { margin: 0; font-size: clamp(36px, 8vw, 64px); line-height: 1; text-wrap: balance; color: var(--fuel); }
+.intro-story { font-size: 18px; max-width: 62ch; }
+.how { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; max-width: 70ch; }
+.how li::marker { color: var(--fuel); font-weight: 700; }
+
 /* mission clock */
 .clock { font-family: Consolas, "Courier New", monospace; color: var(--food); font-variant-numeric: tabular-nums; }
 

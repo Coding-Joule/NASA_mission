@@ -38,7 +38,6 @@ These aren't used yet. Draw them if you have time.
 
 | File | What to draw | For |
 |---|---|---|
-| `crew/chloe.png`, `crew/evan.png`, `crew/ellie.png`, `crew/max.png`, `crew/diana.png` | Each team member as an astronaut | Picking a character |
 | `title.png` | Game logo / title art | Start screen |
 
 ## Credits (fill this in, because judges check it)

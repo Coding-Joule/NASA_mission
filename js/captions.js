@@ -2,7 +2,7 @@
 // A new caption fades in every few seconds. Each part of the mission has
 // its own list, plus facts about the planet you're visiting.
 //
-// Edit, add or remove lines freely (Chloe: story voice, Diana: check facts).
+// Edit, add or remove lines freely. Check every fact against a NASA page.
 // These words get filled in automatically:
 //   {planet}  {trip_days}  {sma_au}  {gravity}  {temperature}  {from_earth}
 
@@ -10,6 +10,10 @@ const CAPTION_SECONDS = 7;   // how long each caption stays
 
 const CAPTIONS = {
   // ---- by part of the mission ----
+  intro: [
+    "Every number in this game comes from NASA: the NASA Planetary Fact Sheet and NASA Mission Viz.",
+    "Mission planners have to fit everything a mission needs into one launch. Nothing can be added once it leaves Earth.",
+  ],
   brief: [
     "Real missions start with a science question, then engineers work out what the spacecraft needs to answer it.",
     "{planet} is {from_earth} million km from Earth at its closest.",

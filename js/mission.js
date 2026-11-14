@@ -54,7 +54,7 @@ const mission = () => levels[index];
 // ---------- helpers ----------
 
 function showPhase(name) {
-  ["brief", "load", "fly", "surface", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
+  ["intro", "brief", "load", "fly", "surface", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
 }
 
 function elapsed() {
@@ -464,7 +464,7 @@ function endMission(success, text) {
     btn.onclick = () => { index += 1; startBriefing(); };
   } else {
     btn.textContent = "Play from the start";
-    btn.onclick = () => { index = 0; startBriefing(); };
+    btn.onclick = showIntro;
   }
   showPhase("result");
   setCaptions("boss");
@@ -489,6 +489,21 @@ $("to-load").onclick = startLoad;
 $("back-brief").onclick = () => { showPhase("brief"); setCaptions("brief"); };
 $("launch").onclick = launch;
 
+// ---------- intro ----------
+
+function showIntro() {
+  index = 0;
+  clearInterval(clockTimer);
+  $("clock").textContent = "T+ 00:00:00";
+  $("mission-name").textContent = "Mission Control";
+  setPlanetPicture(mission().planet);
+  moveRocket(0);
+  $("log").replaceChildren();
+  showPhase("intro");
+  setCaptions("intro");
+}
+$("start-game").onclick = startBriefing;
+
 loadLevels().then((data) => {
   earth = data.earth;
   levels = data.levels;
@@ -496,5 +511,5 @@ loadLevels().then((data) => {
   levels.forEach((m) => {
     if (!m.trip_days) m.trip_days = Math.round(hohmannDays(m.sma_au, earth));
   });
-  startBriefing();
+  showIntro();
 });

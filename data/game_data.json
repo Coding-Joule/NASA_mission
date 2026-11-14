@@ -20,6 +20,6 @@
       "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
     { "level": 3, "minutes": 1, "planet": "Europa",  "distance": 778.5, "from_earth": 628.9, "sma_au": 5.2044,   "period_days": 4332.59,
       "gravity": 1.31, "temperature": -160, "fuel": 13,  "food": 52,
-      "note": "Europa is a moon of Jupiter. It isn't in the Mission Viz table, so its distance, year and trip time use Jupiter's row. Gravity and temperature: check on NASA's Europa page (Diana)." }
+      "note": "Europa is a moon of Jupiter. It isn't in the Mission Viz table, so its distance, year and trip time use Jupiter's row. Gravity and temperature: check on NASA's Europa page." }
   ]
 }

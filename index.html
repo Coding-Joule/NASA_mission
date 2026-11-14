@@ -29,8 +29,28 @@
       <p class="caption" id="caption" aria-live="polite"></p>
     </section>
 
+    <!-- INTRO: the story and how to play -->
+    <section class="panel intro" id="phase-intro" hidden>
+      <p class="eyebrow">NASA Space Apps 2026 · Space Mission Design Game</p>
+      <h1 class="intro-title">Last Chance Mission</h1>
+      <p class="intro-story">
+        You're a mission planner at Mission Control, and your last few missions didn't go well.
+        The boss is giving you <strong>one last chance</strong>: plan three missions, from the Moon
+        to Mars to Europa. Get your crew there, bring back the science, and get them home.
+        Mess up, and you're fired.
+      </p>
+      <ol class="how">
+        <li><strong>Read the briefing.</strong> Real NASA numbers tell you how hard each world is.</li>
+        <li><strong>Load the rocket.</strong> Split 100 mission points between fuel and food. Stronger gravity needs more fuel, and longer trips need more food.</li>
+        <li><strong>Fly and land.</strong> Run out of food and the crew starves; run out of fuel and you crash.</li>
+        <li><strong>Collect the science.</strong> Grab rocks, pictures and ground samples before time runs out: 3 minutes, then 2, then 1.</li>
+        <li><strong>Fly home and face the boss.</strong> Keep your job, or get fired.</li>
+      </ol>
+      <button class="go" id="start-game">Start mission 1</button>
+    </section>
+
     <!-- PHASE 1: briefing -->
-    <section class="panel" id="phase-brief">
+    <section class="panel" id="phase-brief" hidden>
       <h2 id="brief-title"></h2>
       <dl class="facts" id="brief-facts"></dl>
       <p id="brief-goal"></p>
