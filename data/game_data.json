@@ -8,7 +8,7 @@
   "rules": {
     "fuel": "gravity (m/s^2) x 10  -> stronger gravity = more fuel",
     "food": "sma_au (distance from Sun in AU, Mission Viz) x 10  -> farther = more food",
-    "trip_days": "Hohmann transfer from Earth: 0.5 x ((1 + sma_au) / 2)^1.5 x Earth's period_days. The Moon isn't in the Mission Viz table, so its trip uses the 3 days Apollo crews took.",
+    "trip_days": "Hohmann transfer from Earth: 0.5 x ((1 + sma_au) / 2)^1.5 x Earth's period_days. The Moon isn't in the Mission Viz table, so its trip uses the 3 days Apollo crews took. Europa orbits Jupiter, so it uses Jupiter's row.",
     "minutes": "time on the surface to collect information (team idea: 3, 2, 1)",
     "from_earth": "closest distance from Earth in million km (Moon: 0.384 from the fact sheet; planets: their distance from the Sun minus Earth's 149.6)"
   },
@@ -18,7 +18,8 @@
       "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
     { "level": 2, "minutes": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4,  "sma_au": 1.523679, "period_days": 686.971,
       "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
-    { "level": 3, "minutes": 1, "planet": "Jupiter", "distance": 778.5, "from_earth": 628.9, "sma_au": 5.2044,   "period_days": 4332.59,
-      "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
+    { "level": 3, "minutes": 1, "planet": "Europa",  "distance": 778.5, "from_earth": 628.9, "sma_au": 5.2044,   "period_days": 4332.59,
+      "gravity": 1.31, "temperature": -160, "fuel": 13,  "food": 52,
+      "note": "Europa is a moon of Jupiter. It isn't in the Mission Viz table, so its distance, year and trip time use Jupiter's row. Gravity and temperature: check on NASA's Europa page (Diana)." }
   ]
 }

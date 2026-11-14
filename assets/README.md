@@ -18,7 +18,7 @@ dashed box with its name, so nothing breaks.
 | ☐ | `earth.png` | Earth | Left end of the flight path | Square, about 512 × 512. Search "Blue Marble". |
 | ☐ | `planets/moon.png` | The Moon | Right end of the path, mission 1 | Square, about 512 × 512, whole Moon in frame |
 | ☐ | `planets/mars.png` | Mars | Right end of the path, mission 2 | Square, about 512 × 512, whole planet in frame |
-| ☐ | `planets/jupiter.png` | Jupiter | Right end of the path, mission 3 | Square, about 512 × 512, whole planet in frame |
+| ☐ | `planets/europa.png` | Europa (Jupiter's icy moon) | Right end of the path, mission 3 | Square, about 512 × 512, whole moon in frame. Search "Europa"; Galileo and Juno took good ones. |
 
 Crop each planet so it fills the square. The game shows it about 140 px wide.
 
@@ -50,7 +50,7 @@ The submission must cite every image. For each NASA image, write its title and l
 | `earth.png` |  |  | NASA |
 | `planets/moon.png` |  |  | NASA |
 | `planets/mars.png` |  |  | NASA |
-| `planets/jupiter.png` |  |  | NASA |
+| `planets/europa.png` |  |  | NASA |
 | `rocket.png` | | | [team member] |
 | `boss.png` | | | [team member] |
 | `surface/rock.png` | | | [team member] |

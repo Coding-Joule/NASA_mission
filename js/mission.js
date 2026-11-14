@@ -13,7 +13,7 @@ const $ = (id) => document.getElementById(id);
 const BACKUP_LEVELS = [
   { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
   { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
-  { level: 3, minutes: 1, planet: "Jupiter", distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 23.1, temperature: -110, fuel: 231, food: 52 },
+  { level: 3, minutes: 1, planet: "Europa",  distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 1.31, temperature: -160, fuel: 13,  food: 52 },
 ];
 const BACKUP_EARTH = { sma_au: 1.0, period_days: 365.25638 };
 
