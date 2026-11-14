@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NASA Mission — Team 2</title>
+  <!-- Fonts load from Google when online; the game falls back to system fonts offline. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Status strip: always visible -->
+  <header class="strip">
+    <span class="strip-id" id="strip-team"></span>
+    <span class="strip-log" id="strip-log">STANDBY</span>
+    <span class="strip-src" id="strip-src"></span>
+  </header>
+
+  <main class="console">
+
+    <!-- 1. TITLE -->
+    <section class="screen" data-screen="title">
+      <p class="eyebrow">NASA Space Apps 2026 · Space Mission Design Game</p>
+      <h1 class="title" id="t-title"></h1>
+      <p class="lede" id="t-tagline"></p>
+      <p class="story" id="t-intro"></p>
+      <div class="row">
+        <button class="btn btn-go" id="t-start"></button>
+      </div>
+      <p class="tbd-count" id="t-tbd" hidden></p>
+    </section>
+
+    <!-- 2. PICK A CREW MEMBER -->
+    <section class="screen" data-screen="crew" hidden>
+      <p class="eyebrow">Step 1 · Personnel file</p>
+      <h2 class="heading">Who's flying on their last chance?</h2>
+      <div class="crew-grid" id="crew-grid"></div>
+    </section>
+
+    <!-- 3. MISSION BRIEFING -->
+    <section class="screen" data-screen="briefing" hidden>
+      <p class="eyebrow" id="b-eyebrow"></p>
+      <h2 class="heading planet-name" id="b-planet"></h2>
+      <div class="brief">
+        <div class="brief-art" id="b-art"></div>
+        <dl class="readouts" id="b-readouts"></dl>
+      </div>
+      <div class="brief-notes">
+        <p><span class="label">Fun fact</span> <span id="b-fact"></span></p>
+        <p><span class="label">Danger</span> <span id="b-danger"></span></p>
+        <p><span class="label">Objective</span> <span id="b-goal"></span></p>
+      </div>
+      <div class="row"><button class="btn btn-go" id="b-next">Pack the rocket</button></div>
+    </section>
+
+    <!-- 4. PACKING -->
+    <section class="screen" data-screen="pack" hidden>
+      <p class="eyebrow">Step 2 · Load manifest</p>
+      <h2 class="heading">Spend your mission points</h2>
+      <div class="budget">
+        <div class="budget-bar"><div class="budget-fill" id="p-fill"></div></div>
+        <p class="budget-text mono" id="p-left"></p>
+      </div>
+      <div class="manifest" id="p-manifest"></div>
+      <div class="row">
+        <button class="btn" id="p-back">Back to briefing</button>
+        <button class="btn btn-go" id="p-launch">Launch</button>
+      </div>
+    </section>
+
+    <!-- 5. LAUNCH CHECK -->
+    <section class="screen" data-screen="check" hidden>
+      <p class="eyebrow">Step 3 · Go / No-go poll</p>
+      <h2 class="heading" id="c-head"></h2>
+      <ol class="poll" id="c-poll"></ol>
+      <div class="row"><button class="btn btn-go" id="c-next"></button></div>
+    </section>
+
+    <!-- 6. ON THE SURFACE -->
+    <section class="screen" data-screen="surface" hidden>
+      <div class="hud">
+        <div class="hud-cell"><span class="label">Time left</span><span class="hud-val mono" id="s-time">0:00</span></div>
+        <div class="hud-cell"><span class="label">Information</span><span class="hud-val mono" id="s-info">0 / 0</span></div>
+        <div class="hud-cell"><span class="label">Spare fuel</span><span class="hud-val mono" id="s-fuel">0</span></div>
+      </div>
+      <p class="story" id="s-howto"></p>
+      <div class="sites" id="s-sites"></div>
+    </section>
+
+    <!-- 7. RESULT -->
+    <section class="screen" data-screen="result" hidden>
+      <div class="stamp" id="r-stamp"></div>
+      <p class="story" id="r-msg"></p>
+      <div class="row">
+        <button class="btn btn-go" id="r-next"></button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bad-situation popup -->
+  <div class="alarm" id="alarm" hidden>
+    <div class="alarm-box" role="alertdialog" aria-labelledby="a-title">
+      <p class="eyebrow alarm-eyebrow">Master alarm</p>
+      <h3 class="heading" id="a-title"></h3>
+      <p id="a-text"></p>
+      <p class="mono alarm-cost" id="a-cost"></p>
+      <div class="row">
+        <button class="btn btn-go" id="a-deal">Deal with it</button>
+        <button class="btn btn-stop" id="a-ignore">Ignore it</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/hardware.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
