@@ -4,11 +4,12 @@
   "rules": {
     "fuel": "gravity (m/s^2) x 10  -> stronger gravity = more fuel",
     "food": "distance from Sun in AU x 10  -> farther = more food (1 AU = 149.6 million km)",
+    "minutes": "time on the surface to collect information (team idea: 3, 2, 1)",
     "from_earth": "closest distance from Earth in million km (Moon: 0.384 from the fact sheet; planets: their distance from the Sun minus Earth's 149.6)"
   },
   "levels": [
-    { "level": 1, "planet": "Moon",    "distance": 149.6, "from_earth": 0.384, "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
-    { "level": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4, "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
-    { "level": 3, "planet": "Jupiter", "distance": 778.5, "from_earth": 628.9, "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
+    { "level": 1, "minutes": 3, "planet": "Moon",    "distance": 149.6, "from_earth": 0.384, "gravity": 1.6,  "temperature": -20,  "fuel": 16,  "food": 10 },
+    { "level": 2, "minutes": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4, "gravity": 3.7,  "temperature": -65,  "fuel": 37,  "food": 15 },
+    { "level": 3, "minutes": 1, "planet": "Jupiter", "distance": 778.5, "from_earth": 628.9, "gravity": 23.1, "temperature": -110, "fuel": 231, "food": 52 }
   ]
 }

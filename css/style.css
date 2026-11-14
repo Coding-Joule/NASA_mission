@@ -129,6 +129,42 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 }
 .stepper output { min-width: 3ch; text-align: center; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* on the surface */
+.surface-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; }
+.timer { font: 700 32px Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums; }
+.timer.low { color: #ff6b7a; }
+.quota { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.quota-item {
+  display: flex; justify-content: space-between; gap: 8px;
+  padding: 10px 12px; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+}
+.quota-item.met { border-color: var(--food); color: var(--food); }
+.spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.spot {
+  position: relative;
+  aspect-ratio: 1; max-width: 100%;
+  display: grid; place-items: center;
+  font: 600 15px system-ui, sans-serif;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px dashed var(--dim);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.spot img { width: 80%; height: 80%; object-fit: contain; }
+.spot:hover { border-color: var(--text); }
+.spot-rock    { border-color: #c9a27a; }
+.spot-picture { border-color: var(--dist); }
+.spot-ground  { border-color: #b58b5a; border-style: dotted; }
+.spot-bar { position: absolute; left: 0; bottom: 0; height: 5px; width: 0; background: var(--food); }
+.spot.working .spot-bar { animation: fill var(--seconds, 2s) linear forwards; }
+@keyframes fill { to { width: 100%; } }
+.spot.done { opacity: 0.35; cursor: default; border-style: solid; }
+.spot.done .spot-bar { width: 100%; }
+
 /* mission log */
 .log-box h3 { margin: 0 0 8px; font-size: 14px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
 .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }

@@ -11,15 +11,24 @@ const $ = (id) => document.getElementById(id);
 // Backup copy of data/game_data.json, used if the file can't load
 // (for example when index.html is opened by double-clicking).
 const BACKUP_LEVELS = [
-  { level: 1, planet: "Moon",    distance: 149.6, from_earth: 0.384, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
-  { level: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
-  { level: 3, planet: "Jupiter", distance: 778.5, from_earth: 628.9, gravity: 23.1, temperature: -110, fuel: 231, food: 52 },
+  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
+  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
+  { level: 3, minutes: 1, planet: "Jupiter", distance: 778.5, from_earth: 628.9, gravity: 23.1, temperature: -110, fuel: 231, food: 52 },
 ];
 
 const BUDGET = 100;          // mission points to split between fuel and food
 const BASE_SECONDS = 2;      // trip time on screen: 2 s + 1 s per 120 million km
 const KM_PER_SECOND = 120;
 const LANDING_SECONDS = 2;   // how long the landing burn takes on screen
+
+// What you collect on the surface. Change "need" and "seconds" to tune it.
+// drawing: put a picture at this path and it replaces the text label.
+const SAMPLES = {
+  rock:    { label: "Rock",    one: "rock",          plural: "rocks",          need: 2, seconds: 3,   drawing: "assets/surface/rock.png" },
+  picture: { label: "Picture", one: "picture",       plural: "pictures",       need: 2, seconds: 1.5, drawing: "assets/surface/picture.png" },
+  ground:  { label: "Ground",  one: "ground sample", plural: "ground samples", need: 2, seconds: 2.5, drawing: "assets/surface/ground.png" },
+};
+const SPOTS_PER_TYPE = 4;    // how many spots of each kind appear on the surface
 
 let levels = [];
 let index = 0;               // which mission we're on
@@ -32,7 +41,7 @@ const mission = () => levels[index];
 // ---------- helpers ----------
 
 function showPhase(name) {
-  ["brief", "load", "fly", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
+  ["brief", "load", "fly", "surface", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
 }
 
 function elapsed() {
@@ -196,10 +205,107 @@ function land(foodLeft) {
         `Landing on ${m.planet} needs ${m.fuel} fuel; you packed ${load.fuel}.`);
     }
     log(`Touchdown on ${m.planet}!`, "good");
-    const spare = Math.round(fuelLeft + foodLeft + (BUDGET - load.fuel - load.food));
-    endMission(true, `You landed safely on ${m.planet} with ${spare} mission points to spare.`);
+    startSurface();
   }
   requestAnimationFrame(frame);
+}
+
+// ---------- 5. collect information on the surface ----------
+
+let collected = {};
+let busy = false;
+let timeLeft = 0;
+let surfaceTimer = null;
+
+function startSurface() {
+  const m = mission();
+  collected = { rock: 0, picture: 0, ground: 0 };
+  busy = false;
+  timeLeft = m.minutes * 60;
+
+  $("surface-title").textContent = `On ${m.planet}: collect information`;
+  log(`You have ${m.minutes} minute${m.minutes > 1 ? "s" : ""} to collect rocks, pictures and ground samples.`);
+
+  // make the spots: SPOTS_PER_TYPE of each kind, shuffled
+  const kinds = [];
+  Object.keys(SAMPLES).forEach((k) => { for (let i = 0; i < SPOTS_PER_TYPE; i++) kinds.push(k); });
+  kinds.sort(() => Math.random() - 0.5);
+
+  const box = $("spots");
+  box.replaceChildren();
+  kinds.forEach((kind) => {
+    const s = SAMPLES[kind];
+    const spot = document.createElement("button");
+    spot.className = `spot spot-${kind}`;
+    spot.innerHTML = `<span class="spot-label">${s.label}</span><span class="spot-bar"></span>`;
+    const img = document.createElement("img");
+    img.alt = s.label;
+    img.onload = () => spot.querySelector(".spot-label").replaceWith(img);
+    img.src = s.drawing;
+    spot.onclick = () => collect(spot, kind);
+    box.append(spot);
+  });
+
+  drawQuota();
+  drawTimer();
+  showPhase("surface");
+  clearInterval(surfaceTimer);
+  surfaceTimer = setInterval(() => {
+    timeLeft -= 1;
+    drawTimer();
+    if (timeLeft <= 0) finishSurface();
+  }, 1000);
+}
+
+function collect(spot, kind) {
+  if (busy || spot.disabled || timeLeft <= 0) return;
+  busy = true;
+  const s = SAMPLES[kind];
+  spot.classList.add("working");
+  spot.style.setProperty("--seconds", `${s.seconds}s`);
+
+  setTimeout(() => {
+    if (timeLeft <= 0) return;           // time ran out while collecting
+    busy = false;
+    spot.classList.remove("working");
+    spot.classList.add("done");
+    spot.disabled = true;
+    collected[kind] += 1;
+    log(`Collected ${s.plural}: ${collected[kind]} of ${s.need}.`);
+    drawQuota();
+    if (Object.keys(SAMPLES).every((k) => collected[k] >= SAMPLES[k].need)) finishSurface();
+  }, s.seconds * 1000);
+}
+
+function drawQuota() {
+  $("quota").innerHTML = Object.entries(SAMPLES).map(([k, s]) => {
+    const done = collected[k] >= s.need;
+    return `<div class="quota-item ${done ? "met" : ""}"><span>${s.plural[0].toUpperCase() + s.plural.slice(1)}</span><strong>${collected[k]} / ${s.need}</strong></div>`;
+  }).join("");
+}
+
+function drawTimer() {
+  const t = Math.max(0, timeLeft);
+  $("surface-timer").textContent = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+  $("surface-timer").classList.toggle("low", t <= 10);
+}
+
+function finishSurface() {
+  clearInterval(surfaceTimer);
+  busy = false;
+  const m = mission();
+  const missing = Object.entries(SAMPLES)
+    .filter(([k, s]) => collected[k] < s.need)
+    .map(([k, s]) => { const n = s.need - collected[k]; return `${n} more ${n === 1 ? s.one : s.plural}`; });
+
+  if (missing.length) {
+    log(`Time's up. Still needed: ${missing.join(", ")}.`, "bad");
+    return endMission(false, `Time ran out on ${m.planet} before you collected enough information ` +
+      `(still needed ${missing.join(", ")}). You're fired.`);
+  }
+  log(`All information collected on ${m.planet}!`, "good");
+  endMission(true, `You landed on ${m.planet} and collected every rock, picture and ground sample ` +
+    `with ${timeLeft} seconds to spare.`);
 }
 
 function drawGauges(fuel, food, km) {
@@ -212,7 +318,7 @@ function drawGauges(fuel, food, km) {
   $("dist-bar").style.width = `${(km / m.from_earth) * 100}%`;
 }
 
-// ---------- 5. result ----------
+// ---------- 6. result ----------
 
 function endMission(success, text) {
   clearInterval(clockTimer);
