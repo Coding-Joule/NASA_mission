@@ -76,10 +76,10 @@ The submission must cite every image. For each NASA image, write its title and l
 
 | File | Title | Link | Made by |
 |---|---|---|---|
-| `earth.png` |  |  | NASA |
-| `planets/moon.png` |  |  | NASA |
-| `planets/mars.png` |  |  | NASA |
-| `planets/europa.png` |  |  | NASA |
+| `earth.jpg` | The Blue Marble (globe, western hemisphere) | https://assets.science.nasa.gov/content/dam/science/esd/eo/content-feature/bluemarble/images/globe_west_2048.jpg | NASA |
+| `planets/moon.jpg` | The Moon's Surface | https://science.nasa.gov/resource/the-moons-surface/ | NASA |
+| `planets/mars.jpg` | Martian Moon Orbiting the Red Planet | https://science.nasa.gov/image-detail/amf-gsfc_20171208_archive_e000019/ | NASA |
+| `planets/europa.jpg` | NASA's Juno Mission Captures Images of Europa (PIA25695) | https://science.nasa.gov/wp-content/uploads/2024/07/pia25695-nasas-juno-mission-captures-images-of-europa.jpg | NASA |
 | `rocket.png` | | | [team member] |
 | `boss.png` | | | [team member] |
 | `surface/rock.png` | | | [team member] |
