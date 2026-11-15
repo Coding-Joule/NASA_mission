@@ -62,8 +62,14 @@ const mission = () => levels[index];
 
 // ---------- helpers ----------
 
+// which music plays on each screen (see js/music.js)
+const PHASE_MOOD = { intro: "calm", brief: "calm", load: "calm", fly: "travel", surface: "surface", quiz: "calm", result: "quiet" };
+let currentPhase = "intro";
+
 function showPhase(name) {
   ["intro", "brief", "load", "fly", "surface", "quiz", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
+  currentPhase = name;
+  Music.mood(PHASE_MOOD[name] || "calm");
 }
 
 function elapsed() {
@@ -304,6 +310,8 @@ let decisionTimer = null;
 // Show a disaster. have = what the player has, e.g. { fuel: 10, food: 4 } or { seconds: 50 }.
 function showDisaster(d, have, onFix, onIgnore) {
   paused = true;
+  Music.sfx("alarm");
+  Music.mood("tense");
   const canFix = Object.entries(d.cost).every(([k, v]) => (have[k] ?? 0) > v);
   log(`Problem: ${d.title}`, "bad");
   openModal(`
@@ -343,6 +351,8 @@ function showDisaster(d, have, onFix, onIgnore) {
     paused = false;
     log(`Fixed: ${d.fix.toLowerCase()} (${costText(d.cost)}).`);
     problemLog.push({ d, result: "fixed" });
+    Music.sfx("fix");
+    Music.mood(PHASE_MOOD[currentPhase] || "calm");
     onFix(d.cost);
   };
   $("ignore").onclick = () => {
@@ -370,6 +380,7 @@ function launch() {
 
   log(`Loaded ${load.fuel} fuel and ${load.food} food.`);
   log(`Liftoff! Heading for ${m.planet}.`, "good");
+  Music.sfx("launch");
   showPhase("fly");
   setCaptions("fly");
 
@@ -417,6 +428,7 @@ function launch() {
 
 function land(foodLeft) {
   setCaptions("land");
+  Music.sfx("land");
   const m = mission();
   const fuelLastsUntil = Math.min(tank.fuel / m.fuel, 1);
   const start = performance.now();
@@ -524,6 +536,7 @@ function collect(spot, kind) {
     spot.classList.add("done");
     spot.disabled = true;
     collected[kind] += 1;
+    Music.sfx("collect");
     log(`Collected ${s.plural}: ${collected[kind]} of ${s.need}.`);
     drawQuota();
     if (Object.keys(SAMPLES).every((k) => collected[k] >= SAMPLES[k].need)) finishSurface();
@@ -799,6 +812,7 @@ function endMission(success, text) {
     }
   }, 22);
   log(success ? `The boss says: you keep your job.` : `The boss says: you're fired.`, success ? "good" : "bad");
+  Music.sfx(success ? "win" : "lose");
 
   const btn = $("result-btn");
   if (!success) {
@@ -915,6 +929,14 @@ function showIntro() {
   setCaptions("intro");
 }
 $("start-game").onclick = startBriefing;
+
+["pointerdown", "keydown"].forEach((ev) => document.addEventListener(ev, () => Music.start(), { once: true }));
+function drawMusicButton() {
+  $("music-btn").textContent = Music.isOn() ? "♪ Music on" : "♪ Music off";
+  $("music-btn").setAttribute("aria-pressed", Music.isOn());
+}
+$("music-btn").onclick = () => { Music.toggle(); drawMusicButton(); };
+drawMusicButton();
 
 loadLevels().then((data) => {
   earth = data.earth;

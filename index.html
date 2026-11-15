@@ -6,13 +6,16 @@
   <title>NASA Mission</title>
   <!-- When you change any .js or .css file, change the ?v=... number below too,
        so browsers load the new files instead of old saved copies. -->
-  <link rel="stylesheet" href="css/style.css?v=20261115b">
+  <link rel="stylesheet" href="css/style.css?v=20261115d">
 </head>
 <body>
 
   <header class="top">
     <span id="mission-name">Loading…</span>
-    <span class="clock" id="clock">T+ 00:00:00</span>
+    <span class="top-right">
+      <button class="music-btn" id="music-btn" aria-pressed="true">♪ Music on</button>
+      <span class="clock" id="clock">T+ 00:00:00</span>
+    </span>
   </header>
 
   <main>
@@ -37,7 +40,7 @@
       <h1 class="intro-title">Last Chance Mission</h1>
       <div class="boss boss-intro">
         <div class="boss-pic">
-          <img src="assets/boss.png" alt="The boss, pointing at you" data-label="Boss drawing" data-fallback="assets/boss-default.svg">
+          <img src="assets/boss-intro.png" alt="The angry boss, hair on fire, pointing at his message" data-label="Boss drawing" data-fallback="assets/boss.png">
           <span class="boss-name">The Boss</span>
         </div>
         <div class="bubble intro-story">
@@ -208,10 +211,11 @@
     <div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div>
   </div>
 
-  <script src="js/captions.js?v=20261115b"></script>
-  <script src="js/disasters.js?v=20261115b"></script>
-  <script src="js/minigames.js?v=20261115b"></script>
-  <script src="js/quiz.js?v=20261115b"></script>
-  <script src="js/mission.js?v=20261115b"></script>
+  <script src="js/music.js?v=20261115d"></script>
+  <script src="js/captions.js?v=20261115d"></script>
+  <script src="js/disasters.js?v=20261115d"></script>
+  <script src="js/minigames.js?v=20261115d"></script>
+  <script src="js/quiz.js?v=20261115d"></script>
+  <script src="js/mission.js?v=20261115d"></script>
 </body>
 </html>

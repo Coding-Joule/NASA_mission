@@ -388,3 +388,23 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 .notes { display: grid; gap: 8px; padding: 14px 16px; border-radius: 10px; background: rgba(111, 211, 143, 0.08); border: 1px dashed var(--food); }
 .notes .eyebrow { color: var(--food); }
 .notes ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+
+/* music button */
+.top-right { display: flex; align-items: center; gap: 14px; }
+.music-btn {
+  font: 600 14px system-ui, sans-serif; color: var(--text);
+  background: transparent; border: 1px solid var(--dim); border-radius: 999px;
+  padding: 4px 12px; cursor: pointer;
+}
+.music-btn[aria-pressed="false"] { color: var(--dim); }
+
+/* intro: the team's drawing points up and to its left, so the boss stands on the right of his speech bubble */
+.boss-intro { grid-template-columns: minmax(0, 1fr) 220px; }
+.boss-intro .boss-pic { order: 2; }
+.boss-intro .bubble { order: 1; }
+.boss-intro .bubble::before { left: auto; right: -12px; border-right: 0; border-left: 12px solid var(--text); }
+.boss-pic img { background: transparent; }
+@media (max-width: 560px) {
+  .boss-intro { grid-template-columns: 1fr; }
+  .boss-intro .boss-pic { order: 0; }
+}

@@ -27,7 +27,7 @@ Crop each planet so it fills the square. The game shows it about 140 px wide.
 | ✓ | File | What to draw | Where it shows | Tips |
 |---|---|---|---|---|
 | ☐ | `rocket.png` | Your rocket, **pointing right** → | Flies along the path | About 256 × 256, transparent background. The game flips it for the trip home and turns it for landing. |
-| ☐ | `boss.png` | The boss character | Boss screen, next to the speech bubble | Square, about 400 × 400. Face and shoulders are enough. |
+| ✓ | `boss.png` + `boss-intro.png` | The boss character | Boss screen, next to the speech bubble | Square, about 400 × 400. Face and shoulders are enough. |
 | ✓ | `surface/rock.png` | Done: real NASA Moon rock photo | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/picture.png` | A camera or photo icon | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/ground.png` | A patch of ground or soil, or a scoop | Surface spots | Square, about 256 × 256, transparent background |
@@ -39,7 +39,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 | ✓ | File | What to draw | When it shows |
 |---|---|---|---|
 | ☐ | `disasters/asteroid.png` | An asteroid flying at you | Flight to Europa |
-| ☐ | `disasters/air-leak.png` | Air hissing out of a crack | Any flight |
+| ✓ | `disasters/air-leak.jpg` | Done: crack with air swirling out | Any flight |
 | ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
 | ☐ | `disasters/solar-panel.png` | A broken solar panel | Any flight |
 | ☐ | `disasters/dust-storm.png` | A big dust storm | On Mars |
