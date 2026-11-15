@@ -42,6 +42,9 @@ const CAPTIONS = {
     "Apollo crews splashed down in the ocean under parachutes after returning from the Moon.",
   ],
   boss: [],
+  quiz: [
+    "Real mission teams check each other's numbers again and again. One wrong number can end a mission.",
+  ],
 
   // ---- facts about each world (shown during every part of its mission) ----
   planets: {
@@ -64,3 +67,19 @@ const CAPTIONS = {
     ],
   },
 };
+
+// "What if...?" cards on the intro screen. Click a card to see the answer.
+const WHAT_IFS = [
+  { q: "What if you packed no food?",
+    a: "Your crew would go hungry. Long trips, like the 259 days to Mars, need lots of food, water and air." },
+  { q: "What if the Moon had Earth's gravity?",
+    a: "Landing would take about 6 times more fuel. Earth's gravity (9.8 m/s²) is about 6 times the Moon's (1.6 m/s²)." },
+  { q: "What if you flew straight to Mars instead of using a Hohmann transfer?",
+    a: "You could get there faster, but you'd burn much more fuel. Most missions pick the fuel-saving path." },
+  { q: "What if a dust storm hits while you're on Mars?",
+    a: "Dust can cover solar panels. A 2018 dust storm ended NASA's Opportunity rover's mission." },
+  { q: "What if Europa's hidden ocean could support life?",
+    a: "That's one of the big questions NASA's Europa Clipper is helping answer." },
+  { q: "What if you ignore a problem in space?",
+    a: "Small problems can turn deadly far from home. In this game, ignoring one ends your mission." },
+];

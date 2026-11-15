@@ -54,7 +54,7 @@ const mission = () => levels[index];
 // ---------- helpers ----------
 
 function showPhase(name) {
-  ["intro", "brief", "load", "fly", "surface", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
+  ["intro", "brief", "load", "fly", "surface", "quiz", "result"].forEach((p) => ($(`phase-${p}`).hidden = p !== name));
 }
 
 function elapsed() {
@@ -199,47 +199,122 @@ document.querySelectorAll(".stepper").forEach((stepper) => {
   });
 });
 
+// ---------- popup (used by disasters and mini games) ----------
+
+let paused = false;      // true while a disaster popup is waiting for an answer
+
+function openModal(html, kind = "") {
+  $("modal-box").className = `modal-box ${kind}`;
+  $("modal-box").innerHTML = html;
+  $("modal").hidden = false;
+  $("modal-box").querySelectorAll("img[data-label]").forEach(useDrawingOrPlaceholder);
+  $("modal-box").querySelector("button:not(:disabled)")?.focus();
+}
+
+function closeModal() {
+  $("modal").hidden = true;
+  $("modal-box").innerHTML = "";
+}
+
+function costText(cost) {
+  return Object.entries(cost).map(([k, v]) => k === "seconds" ? `${v} seconds` : `${v} ${k}`).join(" and ");
+}
+
+// Pick a disaster for this part of the mission, or null for no disaster.
+function pickDisaster(part) {
+  if (Math.random() >= DISASTER_CHANCE) return null;
+  const m = mission();
+  const options = DISASTERS[part].filter((d) => !d.where || d.where.includes(m.planet));
+  return options.length ? options[Math.floor(Math.random() * options.length)] : null;
+}
+
+// Show a disaster. have = what the player has, e.g. { fuel: 10, food: 4 } or { seconds: 50 }.
+function showDisaster(d, have, onFix, onIgnore) {
+  paused = true;
+  const canFix = Object.entries(d.cost).every(([k, v]) => (have[k] ?? 0) > v);
+  log(`Problem: ${d.title}`, "bad");
+  openModal(`
+    <p class="eyebrow alarm">Problem!</p>
+    <div class="disaster">
+      <img src="assets/disasters/${d.id}.png" alt="${d.title}" data-label="${d.title} drawing">
+      <div>
+        <h3>${d.title}</h3>
+        <p>${d.text}</p>
+      </div>
+    </div>
+    <p class="learn"><strong>Did you know?</strong> ${d.learn}</p>
+    <p class="hint">${canFix ? `Fixing it costs ${costText(d.cost)}.`
+                             : `Fixing it costs ${costText(d.cost)}, and you don't have enough left.`}</p>
+    <div class="row">
+      <button class="go" id="fix" ${canFix ? "" : "disabled"}>${d.fix}</button>
+      <button class="ghost danger" id="ignore">Ignore it</button>
+    </div>
+  `, "disaster-box");
+  $("fix").onclick = () => {
+    closeModal();
+    paused = false;
+    log(`Fixed: ${d.fix.toLowerCase()} (${costText(d.cost)}).`);
+    onFix(d.cost);
+  };
+  $("ignore").onclick = () => {
+    closeModal();
+    log(`Ignored the problem.`, "bad");
+    onIgnore(`${d.ignore} Ignoring problems in space can end a mission.`);
+  };
+}
+
 // ---------- 3. fly ----------
+
+let tank = { fuel: 0, food: 0 };   // what's on board right now
 
 function launch() {
   const m = mission();
   missionStart = performance.now();
   clockTimer = setInterval(() => ($("clock").textContent = `T+ ${elapsed()}`), 250);
+  tank = { fuel: load.fuel, food: load.food };
+  paused = false;
 
   log(`Loaded ${load.fuel} fuel and ${load.food} food.`);
   log(`Liftoff! Heading for ${m.planet}.`, "good");
   showPhase("fly");
   setCaptions("fly");
 
-  // food runs out at this point of the trip (1 = makes it all the way)
-  const foodLastsUntil = Math.min(load.food / m.food, 1);
   const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
-  const start = performance.now();
-  let halfwayLogged = false;
+  const disaster = pickDisaster("flight");
+  const disasterAt = 0.3 + Math.random() * 0.4;    // somewhere in the middle of the trip
+  let t = 0, last = performance.now(), halfwayLogged = false, disasterDone = !disaster, over = false;
 
   function frame(now) {
-    const progress = Math.min((now - start) / duration, foodLastsUntil);
-    const foodLeft = load.food - m.food * progress;
-    drawGauges(load.fuel, foodLeft, m.from_earth * (1 - progress));
-    drawDay(progress, m.trip_days);
-    moveRocket(progress);
+    if (over) return;
+    if (!paused) t = Math.min(1, t + (now - last) / duration);
+    last = now;
+    const foodLeft = tank.food - m.food * t;
+    drawGauges(tank.fuel, foodLeft, m.from_earth * (1 - t));
+    drawDay(t, m.trip_days);
+    moveRocket(t);
 
-    if (!halfwayLogged && progress >= 0.5) {
-      halfwayLogged = true;
-      log(`Day ${Math.round(m.trip_days / 2)}: halfway there. ${Math.round(foodLeft)} food left.`);
-    }
-
-    if (progress < foodLastsUntil) return requestAnimationFrame(frame);
-
-    if (foodLastsUntil < 1) {
-      const kmLeft = (m.from_earth * (1 - progress)).toFixed(1);
-      const day = Math.max(1, Math.round(m.trip_days * progress));
+    if (foodLeft < -0.001) {
+      over = true;
+      const kmLeft = (m.from_earth * (1 - t)).toFixed(1);
+      const day = Math.max(1, Math.round(m.trip_days * t));
       log(`Day ${day}: out of food with ${kmLeft} million km to go.`, "bad");
       return endMission(false, `On day ${day} of ${m.trip_days}, your crew ran out of food ` +
         `${kmLeft} million km from ${m.planet}. This trip needs ${m.food} food; you packed ${load.food}.`);
     }
+    if (!halfwayLogged && t >= 0.5) {
+      halfwayLogged = true;
+      log(`Day ${Math.round(m.trip_days / 2)}: halfway there. ${Math.round(foodLeft)} food left.`);
+    }
+    if (!disasterDone && t >= disasterAt) {
+      disasterDone = true;
+      showDisaster(disaster, { fuel: tank.fuel, food: foodLeft },
+        (cost) => { tank.fuel -= cost.fuel || 0; tank.food -= cost.food || 0; },
+        (why) => { over = true; endMission(false, why); });
+    }
+    if (t < 1) return requestAnimationFrame(frame);
+
     log(`Day ${m.trip_days}: arrived at ${m.planet}. Starting landing burn.`);
-    land(load.food - m.food);
+    land(Math.max(0, foodLeft));
   }
   requestAnimationFrame(frame);
 }
@@ -249,12 +324,12 @@ function launch() {
 function land(foodLeft) {
   setCaptions("land");
   const m = mission();
-  const fuelLastsUntil = Math.min(load.fuel / m.fuel, 1);
+  const fuelLastsUntil = Math.min(tank.fuel / m.fuel, 1);
   const start = performance.now();
 
   function frame(now) {
     const progress = Math.min((now - start) / (LANDING_SECONDS * 1000), fuelLastsUntil);
-    const fuelLeft = load.fuel - m.fuel * progress;
+    const fuelLeft = tank.fuel - m.fuel * progress;
     drawGauges(fuelLeft, foodLeft, 0);
     moveRocket(1, progress * 40);
 
@@ -263,7 +338,7 @@ function land(foodLeft) {
     if (fuelLastsUntil < 1) {
       log(`Fuel tanks empty during landing.`, "bad");
       return endMission(false, `Your lander couldn't fight ${m.planet}'s gravity and crashed. ` +
-        `Landing on ${m.planet} needs ${m.fuel} fuel; you packed ${load.fuel}.`);
+        `Landing on ${m.planet} needs ${m.fuel} fuel; you had ${Math.round(tank.fuel)} left.`);
     }
     log(`Touchdown on ${m.planet}!`, "good");
     left = { fuel: fuelLeft, food: foodLeft };
@@ -283,7 +358,12 @@ function startSurface() {
   const m = mission();
   collected = { rock: 0, picture: 0, ground: 0 };
   busy = false;
+  paused = false;
   timeLeft = m.minutes * 60;
+  const disaster = pickDisaster("surface");
+  // the problem shows up when 40-75% of the time is still left
+  const disasterAtSecond = Math.round(timeLeft * (0.4 + Math.random() * 0.35));
+  let disasterDone = !disaster;
 
   $("surface-title").textContent = `On ${m.planet}: collect information`;
   log(`You have ${m.minutes} minute${m.minutes > 1 ? "s" : ""} to collect rocks, pictures and ground samples.`);
@@ -315,30 +395,35 @@ function startSurface() {
   setCaptions("surface");
   clearInterval(surfaceTimer);
   surfaceTimer = setInterval(() => {
+    if (paused) return;
     timeLeft -= 1;
     drawTimer();
-    if (timeLeft <= 0) finishSurface();
+    if (timeLeft <= 0) return finishSurface();
+    if (!disasterDone && !busy && timeLeft <= disasterAtSecond) {
+      disasterDone = true;
+      showDisaster(disaster, { seconds: timeLeft },
+        (cost) => { timeLeft = Math.max(1, timeLeft - (cost.seconds || 0)); drawTimer(); },
+        (why) => endMission(false, why));
+    }
   }, 1000);
 }
 
 function collect(spot, kind) {
-  if (busy || spot.disabled || timeLeft <= 0) return;
+  if (busy || paused || spot.disabled || timeLeft <= 0) return;
   busy = true;
   const s = SAMPLES[kind];
   spot.classList.add("working");
-  spot.style.setProperty("--seconds", `${s.seconds}s`);
-
-  setTimeout(() => {
-    if (timeLeft <= 0) return;           // time ran out while collecting
+  playMiniGame(kind, (ok) => {
     busy = false;
     spot.classList.remove("working");
+    if (!ok || timeLeft <= 0) return;
     spot.classList.add("done");
     spot.disabled = true;
     collected[kind] += 1;
     log(`Collected ${s.plural}: ${collected[kind]} of ${s.need}.`);
     drawQuota();
     if (Object.keys(SAMPLES).every((k) => collected[k] >= SAMPLES[k].need)) finishSurface();
-  }, s.seconds * 1000);
+  });
 }
 
 function drawQuota() {
@@ -356,6 +441,8 @@ function drawTimer() {
 
 function finishSurface() {
   clearInterval(surfaceTimer);
+  stopMini();
+  closeModal();
   busy = false;
   const m = mission();
   const missing = Object.entries(SAMPLES)
@@ -393,7 +480,8 @@ function flyHome(passed, report) {
     if (t < 1) return requestAnimationFrame(frame);
 
     log(`Splashdown! Back on Earth. Reporting to the boss.`, "good");
-    endMission(passed, report);
+    if (passed) startQuiz(report);
+    else endMission(false, report);
   }
   requestAnimationFrame(frame);
 }
@@ -416,7 +504,58 @@ function drawGauges(fuel, food, km) {
   $("dist-bar").style.width = `${(km / m.from_earth) * 100}%`;
 }
 
-// ---------- 7. the boss decides ----------
+// ---------- 7. the boss's quiz ----------
+
+function startQuiz(report) {
+  const m = mission();
+  const questions = buildQuiz(m, levels);
+  let n = 0, score = 0;
+  showPhase("quiz");
+  setCaptions("quiz");
+  log(`The boss is giving you a quiz.`);
+
+  function ask() {
+    const q = questions[n];
+    $("quiz-count").textContent = `Question ${n + 1} of ${questions.length}`;
+    $("quiz-q").textContent = q.q;
+    $("quiz-why").textContent = "";
+    $("quiz-next").hidden = true;
+    const box = $("quiz-options");
+    box.replaceChildren();
+    q.options.forEach((opt) => {
+      const b = document.createElement("button");
+      b.className = "option";
+      b.textContent = opt;
+      b.onclick = () => {
+        const right = opt === q.right;
+        if (right) score += 1;
+        box.querySelectorAll("button").forEach((x) => {
+          x.disabled = true;
+          if (x.textContent === q.right) x.classList.add("right");
+        });
+        if (!right) b.classList.add("wrong");
+        $("quiz-why").textContent = `${right ? "Correct!" : "Not quite."} ${q.why}`;
+        $("quiz-next").hidden = false;
+        $("quiz-next").textContent = n + 1 < questions.length ? "Next question" : "See what the boss says";
+        $("quiz-next").focus();
+      };
+      box.append(b);
+    });
+  }
+
+  $("quiz-next").onclick = () => {
+    n += 1;
+    if (n < questions.length) return ask();
+    const ok = score >= QUIZ_PASS;
+    log(`Quiz score: ${score} of ${questions.length}.`, ok ? "good" : "bad");
+    endMission(ok, ok
+      ? `${report} And you got ${score} of ${questions.length} on my quiz, so you really understand the data.`
+      : `${report} But you only got ${score} of ${questions.length} on my quiz. A mission planner has to understand the data.`);
+  };
+  ask();
+}
+
+// ---------- 8. the boss decides ----------
 
 // The boss's words. Change these to whatever your team wants.
 const BOSS = {
@@ -430,6 +569,9 @@ let typing = null;
 function endMission(success, text) {
   clearInterval(clockTimer);
   clearInterval(surfaceTimer);
+  stopMini();
+  closeModal();
+  paused = false;
   const last = index === levels.length - 1;
   const lines = success ? BOSS.keep : BOSS.fired;
 
@@ -499,6 +641,13 @@ function showIntro() {
   setPlanetPicture(mission().planet);
   moveRocket(0);
   $("log").replaceChildren();
+  $("what-ifs").replaceChildren(...WHAT_IFS.map((w) => {
+    const b = document.createElement("button");
+    b.className = "what-if";
+    b.innerHTML = `<span class="wi-q">${w.q}</span><span class="wi-a">${w.a}</span>`;
+    b.onclick = () => b.classList.toggle("open");
+    return b;
+  }));
   showPhase("intro");
   setCaptions("intro");
 }

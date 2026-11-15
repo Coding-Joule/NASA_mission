@@ -32,6 +32,36 @@ Crop each planet so it fills the square. The game shows it about 140 px wide.
 | ☐ | `surface/picture.png` | A camera or photo icon | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/ground.png` | A patch of ground or soil, or a scoop | Surface spots | Square, about 256 × 256, transparent background |
 
+### Disaster pictures (drawn by the team)
+
+They show in the "Problem!" popup. Square, about 256 × 256, transparent background.
+
+| ✓ | File | What to draw | When it shows |
+|---|---|---|---|
+| ☐ | `disasters/asteroid.png` | An asteroid flying at you | Flight to Europa |
+| ☐ | `disasters/air-leak.png` | Air hissing out of a crack | Any flight |
+| ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
+| ☐ | `disasters/solar-panel.png` | A broken solar panel | Any flight |
+| ☐ | `disasters/dust-storm.png` | A big dust storm | On Mars |
+| ☐ | `disasters/moon-dust.png` | Dusty, jammed tools | On the Moon |
+| ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
+| ☐ | `disasters/ice-crack.png` | Ice cracking open | On Europa |
+| ☐ | `disasters/equipment.png` | A bent robot arm | Any surface |
+
+The mini games reuse the rock, picture and ground drawings above, so they don't need new art.
+
+### NASA image links from the team doc
+
+These were found by the team. Download each one, rename it, and put it in the right place:
+
+| Save as | Link |
+|---|---|
+| `earth.jpg` | https://assets.science.nasa.gov/content/dam/science/esd/eo/content-feature/bluemarble/images/globe_west_2048.jpg |
+| `planets/mars.jpg` | Open https://science.nasa.gov/image-detail/amf-gsfc_20171208_archive_e000019/ and download the image |
+| `planets/europa.jpg` | https://science.nasa.gov/wp-content/uploads/2024/07/pia25695-nasas-juno-mission-captures-images-of-europa.jpg |
+| `planets/moon.jpg` | Still needed: search "Moon" on images.nasa.gov |
+| `surface/rock.jpg` (optional, instead of a drawing) | https://www.nasa.gov/wp-content/uploads/2019/07/d_2c-xhwkaasmci.jpg (Moon rock) |
+
 ### Optional, for later steps
 
 These aren't used yet. Draw them if you have time.
