@@ -15,10 +15,10 @@ dashed box with its name, so nothing breaks.
 
 | ✓ | File | What it is | Where it shows | Tips |
 |---|---|---|---|---|
-| ☐ | `earth.png` | Earth | Left end of the flight path | Square, about 512 × 512. Search "Blue Marble". |
-| ☐ | `planets/moon.png` | The Moon | Right end of the path, mission 1 | Square, about 512 × 512, whole Moon in frame |
-| ☐ | `planets/mars.png` | Mars | Right end of the path, mission 2 | Square, about 512 × 512, whole planet in frame |
-| ☐ | `planets/europa.png` | Europa (Jupiter's icy moon) | Right end of the path, mission 3 | Square, about 512 × 512, whole moon in frame. Search "Europa"; Galileo and Juno took good ones. |
+| ✓ | `earth.jpg` | Earth | Left end of the flight path | Square, about 512 × 512. Search "Blue Marble". |
+| ✓ | `planets/moon.jpg` | The Moon | Right end of the path, mission 1 | Square, about 512 × 512, whole Moon in frame |
+| ✓ | `planets/mars.jpg` | Mars | Right end of the path, mission 2 | Square, about 512 × 512, whole planet in frame |
+| ✓ | `planets/europa.jpg` | Europa (Jupiter's icy moon) | Right end of the path, mission 3 | Square, about 512 × 512, whole moon in frame. Search "Europa"; Galileo and Juno took good ones. |
 
 Crop each planet so it fills the square. The game shows it about 140 px wide.
 
@@ -26,7 +26,7 @@ Crop each planet so it fills the square. The game shows it about 140 px wide.
 
 | ✓ | File | What to draw | Where it shows | Tips |
 |---|---|---|---|---|
-| ☐ | `rocket.png` | Your rocket, **pointing right** → | Flies along the path | About 256 × 256, transparent background. The game flips it for the trip home and turns it for landing. |
+| ✓ | `rocket.png` | Your rocket, **pointing right** → | Flies along the path | About 256 × 256, transparent background. The game flips it for the trip home and turns it for landing. |
 | ✓ | `boss.png` + `boss-intro.png` | The boss character | Boss screen, next to the speech bubble | Square, about 400 × 400. Face and shoulders are enough. |
 | ✓ | `surface/rock.png` | Done: real NASA Moon rock photo | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/picture.png` | A camera or photo icon | Surface spots | Square, about 256 × 256, transparent background |
@@ -40,13 +40,13 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 |---|---|---|---|
 | ✓ | `disasters/asteroid.png` | Done: cracked gray asteroid | Flight to Europa |
 | ✓ | `disasters/air-leak.jpg` | Done: crack with air swirling out | Any flight |
-| ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
+| ✓ | `disasters/solar-flare.jpg` | Done: the Sun with a red flare | Any flight |
 | ✓ | `disasters/solar-panel.png` | Done: cracked solar panel | Any flight |
 | ✓ | `disasters/dust-storm.png` | Done: swirling dust storm | On Mars |
 | ✓ | `disasters/moon-dust.png` | Done: Moon dust cloud | On the Moon |
 | ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
 | ✓ | `disasters/ice-crack.jpg` | Done: cracking blue ice | On Europa |
-| ☐ | `disasters/equipment.png` | A bent robot arm | Any surface |
+| ✓ | `disasters/equipment.png` | Done: robot with a broken arm and loose wires | Any surface |
 
 The mini games reuse the rock, picture and ground drawings above, so they don't need new art.
 
