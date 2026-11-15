@@ -789,6 +789,12 @@ function endMission(success, text) {
   const lines = success ? BOSS.keep : BOSS.fired;
 
   $("boss-name").textContent = BOSS.name;
+  // fired = the angry boss with his hair on fire; not fired = the normal boss
+  const bossImg = document.querySelector("#phase-result .boss-pic img");
+  if (bossImg) {
+    bossImg.src = success ? "assets/boss.png" : "assets/boss-intro.png";
+    bossImg.alt = success ? "The boss" : "The boss, furious, with his hair on fire";
+  }
   $("result-title").textContent = success ? "Not fired" : "Fired";
   $("result-title").className = `verdict ${success ? "good" : "bad"}`;
   $("result-title").hidden = true;
