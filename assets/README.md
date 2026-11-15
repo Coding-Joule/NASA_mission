@@ -44,7 +44,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 | ✓ | `disasters/solar-panel.png` | Done: cracked solar panel | Any flight |
 | ✓ | `disasters/dust-storm.png` | Done: swirling dust storm | On Mars |
 | ✓ | `disasters/moon-dust.png` | Done: Moon dust cloud | On the Moon |
-| ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
+| ✓ | `disasters/radiation.png` | Done: radiation warning sign | On Europa |
 | ✓ | `disasters/ice-crack.jpg` | Done: cracking blue ice | On Europa |
 | ✓ | `disasters/equipment.png` | Done: robot with a broken arm and loose wires | Any surface |
 
