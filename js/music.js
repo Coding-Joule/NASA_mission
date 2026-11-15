@@ -1,4 +1,6 @@
 // Music and sound effects, made live in the browser with the Web Audio API.
+// Style: eerie, mysterious "space mystery" music (a ghostly whistle with
+// wobble and echo over dark minor chords). The tune is our own original one.
 // No music files: every note is generated here, so it's 100% original,
 // works offline, and has no copyright problems.
 //
@@ -11,15 +13,17 @@ const Music = (() => {
   // ---- settings you can change ----
   const VOLUME = 0.5;                        // overall loudness, 0 to 1
   const MOODS = {
-    //            beats per minute, arpeggio on, bass pulse on, pad on
-    calm:    { bpm: 70,  arp: true,  bass: false, pad: true },
-    travel:  { bpm: 84,  arp: true,  bass: true,  pad: true },
-    surface: { bpm: 104, arp: true,  bass: true,  pad: false },
-    tense:   { bpm: 132, arp: false, bass: true,  pad: false },
-    quiet:   { bpm: 70,  arp: false, bass: false, pad: false },
+    //            beats per minute, arpeggio, bass pulse, pad, ghostly whistle
+    calm:    { bpm: 76,  arp: true,  bass: false, pad: true,  whistle: true },
+    travel:  { bpm: 88,  arp: true,  bass: true,  pad: true,  whistle: true },
+    surface: { bpm: 108, arp: true,  bass: true,  pad: false, whistle: false },
+    tense:   { bpm: 132, arp: false, bass: true,  pad: false, whistle: false },
+    quiet:   { bpm: 70,  arp: false, bass: false, pad: true,  whistle: false },
   };
-  // A minor → F → C → G, as MIDI note numbers
-  const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];
+  // Dark minor chords: C minor → A-flat → F minor → G (MIDI note numbers)
+  const CHORDS = [[48, 51, 55], [44, 48, 51], [41, 44, 48], [43, 47, 50]];
+  // Our own spooky whistle tune: one note per 2 beats, null = rest
+  const WHISTLE = [72, null, 75, 74, 72, null, 67, null, 68, 67, 65, null, 67, null, null, null];
 
   let ctx = null, master, musicBus, sfxBus;
   let on = true, current = "calm", timer = null, beat = 0, nextTime = 0;
@@ -38,9 +42,9 @@ const Music = (() => {
 
     // a soft echo makes it sound like space
     const echo = ctx.createDelay(1);
-    echo.delayTime.value = 0.36;
+    echo.delayTime.value = 0.45;
     const feedback = ctx.createGain();
-    feedback.gain.value = 0.35;
+    feedback.gain.value = 0.45;
     echo.connect(feedback); feedback.connect(echo); echo.connect(master);
 
     musicBus = ctx.createGain(); musicBus.gain.value = 0.32;
@@ -51,8 +55,16 @@ const Music = (() => {
   }
 
   // one note: oscillator → filter → volume envelope
-  function note(midi, when, length, { type = "sine", vol = 0.2, attack = 0.02, cutoff = 2400, bus = musicBus, slideTo = null } = {}) {
+  function note(midi, when, length, { type = "sine", vol = 0.2, attack = 0.02, cutoff = 2400, bus = musicBus, slideTo = null, wobble = 0 } = {}) {
     const osc = ctx.createOscillator();
+    if (wobble) {                              // vibrato: the ghostly "wobble" of the whistle
+      const lfo = ctx.createOscillator();
+      const depth = ctx.createGain();
+      lfo.frequency.value = 5.5;
+      depth.gain.value = hz(midi) * wobble;
+      lfo.connect(depth); depth.connect(osc.frequency);
+      lfo.start(when); lfo.stop(when + length + 0.05);
+    }
     const filter = ctx.createBiquadFilter();
     const amp = ctx.createGain();
     osc.type = type;
@@ -75,15 +87,20 @@ const Music = (() => {
     while (nextTime < ctx.currentTime + 0.25) {
       const chord = CHORDS[Math.floor(beat / 8) % CHORDS.length];
       if (m.pad && beat % 8 === 0) {
-        chord.forEach((n) => note(n, nextTime, beatLen * 8, { type: "triangle", vol: 0.07, attack: 0.8, cutoff: 900 }));
+        chord.forEach((n) => note(n + 12, nextTime, beatLen * 8, { type: "triangle", vol: 0.06, attack: 1.2, cutoff: 800 }));
       }
       if (m.arp) {
-        const pattern = [0, 1, 2, 1];
-        const n = chord[pattern[beat % 4]] + 12;
-        note(n, nextTime, beatLen * 1.6, { type: "sine", vol: 0.09, attack: 0.01, cutoff: 3000 });
+        // quick, bell-like notes high up, like a mysterious piano
+        const pattern = [0, 2, 1, 2];
+        const n = chord[pattern[beat % 4]] + 24;
+        note(n, nextTime, beatLen * 1.2, { type: "sine", vol: 0.07, attack: 0.005, cutoff: 4000 });
+      }
+      if (m.whistle && beat % 2 === 0) {
+        const w = WHISTLE[(beat / 2) % WHISTLE.length];
+        if (w !== null) note(w, nextTime, beatLen * 2.2, { type: "sine", vol: 0.1, attack: 0.25, cutoff: 3000, wobble: 0.012 });
       }
       if (m.bass) {
-        note(chord[0] - 24, nextTime, beatLen * 0.45, { type: "square", vol: current === "tense" ? 0.09 : 0.05, cutoff: 500 });
+        note(chord[0] - 12, nextTime, beatLen * 0.45, { type: "square", vol: current === "tense" ? 0.09 : 0.05, cutoff: 500 });
       }
       nextTime += beatLen;
       beat += 1;

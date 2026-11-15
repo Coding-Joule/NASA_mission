@@ -18,13 +18,13 @@
   "earth": { "sma_au": 1.0, "period_days": 365.25638 },
   "levels": [
     { "level": 1, "minutes": 3, "planet": "Moon",    "distance": 149.6, "from_earth": 0.384, "sma_au": 1.0,      "period_days": null,    "trip_days": 3,
-      "gravity": 1.6,  "temperature": -20,  "temp_min": -130, "temp_max": 120, "fuel": 16,  "food": 10, "budget": 85,
+      "gravity": 1.6,  "temperature": -20,  "temp_min": -130, "temp_max": 120, "fuel": 16,  "food": 10, "budget": 100,
       "real_mission": { "name": "Apollo 11", "days": 3, "note": "Apollo 11 launched on July 16, 1969 and reached the Moon 3 days later, just like your trip." } },
     { "level": 2, "minutes": 2, "planet": "Mars",    "distance": 228.0, "from_earth": 78.4,  "sma_au": 1.523679, "period_days": 686.971,
-      "gravity": 3.7,  "temperature": -65,  "temp_min": -153, "temp_max": 20,  "fuel": 37,  "food": 15, "budget": 130,
+      "gravity": 3.7,  "temperature": -65,  "temp_min": -153, "temp_max": 20,  "fuel": 37,  "food": 15, "budget": 145,
       "real_mission": { "name": "Perseverance rover", "days": 203, "note": "Perseverance launched on July 30, 2020 and landed on February 18, 2021: 203 days. Real missions launch when Earth and Mars line up and take a slightly faster path than a perfect Hohmann transfer." } },
     { "level": 3, "minutes": 1, "planet": "Europa",  "distance": 778.5, "from_earth": 628.9, "sma_au": 5.2044,   "period_days": 4332.59,
-      "gravity": 1.31, "temperature": -160, "temp_min": -220, "temp_max": -160, "fuel": 13,  "food": 52, "budget": 155,
+      "gravity": 1.31, "temperature": -160, "temp_min": -220, "temp_max": -160, "fuel": 13,  "food": 52, "budget": 170,
       "real_mission": { "name": "Europa Clipper", "days": 2000, "note": "Europa Clipper launched in October 2024 and reaches Jupiter in 2030, about 5.5 years. It flies past Mars and Earth first for gravity assists: a longer path that saves fuel, because no rocket could carry enough for the direct trip." },
       "note": "Europa is a moon of Jupiter. It isn't in the Mission Viz table, so its distance, year and trip time use Jupiter's row. Gravity and temperature: check on NASA's Europa page." }
   ]
