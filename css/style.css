@@ -338,3 +338,19 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 .toggle.on { background: var(--food); border-color: var(--food); color: var(--space); }
 .hint.warn { color: var(--fuel); }
 .decide { margin: 0; font-weight: 700; color: #ff6b7a; }
+
+/* mission report card */
+.report { display: grid; gap: 12px; padding: 18px 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--dim); }
+.report h3 { margin: 0; font-size: 22px; }
+.report h4 { margin: 8px 0 0; font-size: 16px; color: var(--dist); text-transform: uppercase; letter-spacing: 0.08em; }
+.report p { margin: 0; }
+.report ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--dim); }
+.report ul strong { color: var(--text); }
+.report-verdict.good { color: var(--food); }
+.report-verdict.bad { color: #ff6b7a; }
+.table-wrap { overflow-x: auto; }
+.report-table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+.report-table th, .report-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.report-table th { color: var(--dim); font-weight: 600; }
+.ok { color: var(--food); font-weight: 700; white-space: nowrap; }
+.short { color: #ff6b7a; font-weight: 700; white-space: nowrap; }

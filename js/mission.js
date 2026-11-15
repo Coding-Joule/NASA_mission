@@ -13,9 +13,12 @@ const $ = (id) => document.getElementById(id);
 // Backup copy of data/game_data.json, used if the file can't load
 // (for example when index.html is opened by double-clicking).
 const BACKUP_LEVELS = [
-  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  temp_min: -130, temp_max: 120, fuel: 16, food: 10, budget: 85 },
-  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  temp_min: -153, temp_max: 20,  fuel: 37, food: 15, budget: 130 },
-  { level: 3, minutes: 1, planet: "Europa",  distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 1.31, temperature: -160, temp_min: -220, temp_max: -160, fuel: 13, food: 52, budget: 155 },
+  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  temp_min: -130, temp_max: 120, fuel: 16, food: 10, budget: 85,
+    real_mission: { name: "Apollo 11", days: 3, note: "Apollo 11 launched on July 16, 1969 and reached the Moon 3 days later, just like your trip." } },
+  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  temp_min: -153, temp_max: 20,  fuel: 37, food: 15, budget: 130,
+    real_mission: { name: "Perseverance rover", days: 203, note: "Perseverance launched on July 30, 2020 and landed on February 18, 2021: 203 days. Real missions launch when Earth and Mars line up and take a slightly faster path than a perfect Hohmann transfer." } },
+  { level: 3, minutes: 1, planet: "Europa",  distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 1.31, temperature: -160, temp_min: -220, temp_max: -160, fuel: 13, food: 52, budget: 155,
+    real_mission: { name: "Europa Clipper", days: 2000, note: "Europa Clipper launched in October 2024 and reaches Jupiter in 2030, about 5.5 years. It flies past Mars and Earth first for gravity assists: a longer path that saves fuel, because no rocket could carry enough for the direct trip." } },
 ];
 const BACKUP_EARTH = { sma_au: 1.0, period_days: 365.25638 };
 
@@ -253,6 +256,7 @@ function costText(cost) {
 // Pick a disaster for this part of the mission, or null for no disaster.
 // The same problem never happens twice in one mission.
 let usedDisasters = new Set();
+let problemLog = [];     // every problem this mission and what the player did (for the report card)
 function pickDisaster(part) {
   if (Math.random() >= DISASTER_CHANCE) return null;
   const m = mission();
@@ -308,6 +312,7 @@ function showDisaster(d, have, onFix, onIgnore) {
       clearInterval(decisionTimer);
       closeModal();
       log(`Took too long to decide.`, "bad");
+      problemLog.push({ d, result: "too slow" });
       onIgnore(`You took too long to decide. ${d.ignore} In space, problems don't wait.`);
     }
   }, 1000);
@@ -316,12 +321,14 @@ function showDisaster(d, have, onFix, onIgnore) {
     closeModal();
     paused = false;
     log(`Fixed: ${d.fix.toLowerCase()} (${costText(d.cost)}).`);
+    problemLog.push({ d, result: "fixed" });
     onFix(d.cost);
   };
   $("ignore").onclick = () => {
     clearInterval(decisionTimer);
     closeModal();
     log(`Ignored the problem.`, "bad");
+    problemLog.push({ d, result: "ignored" });
     onIgnore(`${d.ignore} Ignoring problems in space can end a mission.`);
   };
 }
@@ -337,6 +344,8 @@ function launch() {
   tank = { fuel: load.fuel, food: load.food };
   paused = false;
   usedDisasters = new Set();
+  problemLog = [];
+  quizScore = null;
 
   log(`Loaded ${load.fuel} fuel and ${load.food} food.`);
   log(`Liftoff! Heading for ${m.planet}.`, "good");
@@ -662,6 +671,7 @@ function startQuiz(report) {
     n += 1;
     if (n < questions.length) return ask();
     const ok = score >= QUIZ_PASS;
+    quizScore = `${score} of ${questions.length}`;
     log(`Quiz score: ${score} of ${questions.length}.`, ok ? "good" : "bad");
     endMission(ok, ok
       ? `${report} And you got ${score} of ${questions.length} on my quiz, so you really understand the data.`
@@ -670,7 +680,60 @@ function startQuiz(report) {
   ask();
 }
 
-// ---------- 8. the boss decides ----------
+// ---------- 8. mission report card ----------
+// What the player planned vs. what was needed, the problems they faced,
+// what the NASA data taught them, and how a real NASA mission compares.
+
+let quizScore = null;
+
+function renderReport(success) {
+  const m = mission();
+  const need = { fuel: 2 * m.fuel, food: 2 * m.food, heater: needsHeater(m), cooler: needsCooler(m) };
+  const gearText = (h, c) => h && c ? "Heater + cooler" : h ? "Heater" : c ? "Cooler" : "None";
+  const mark = (ok) => ok ? `<span class="ok">✓ enough</span>` : `<span class="short">✗ short</span>`;
+  const gearOk = load.heater === need.heater && load.cooler === need.cooler;
+  const spare = load.fuel - need.fuel + load.food - need.food;
+  const goodPlan = load.fuel >= need.fuel && load.food >= need.food && (!need.heater || load.heater) && (!need.cooler || load.cooler);
+
+  const rows = [
+    ["Fuel", load.fuel, `${need.fuel} (${m.fuel} to land + ${m.fuel} to take off)`, load.fuel >= need.fuel],
+    ["Food", load.food, `${need.food} (${m.food} there + ${m.food} home)`, load.food >= need.food],
+    ["Temperature gear", gearText(load.heater, load.cooler), gearText(need.heater, need.cooler), gearOk],
+  ].map(([what, packed, needed, ok]) =>
+    `<tr><td>${what}</td><td>${packed}</td><td>${needed}</td><td>${mark(ok)}</td></tr>`).join("");
+
+  const problems = problemLog.length
+    ? problemLog.map((p) => `<li><strong>${p.d.title}</strong> ${p.result === "fixed" ? "fixed" : p.result === "ignored" ? "ignored" : "not decided in time"}. ${p.d.learn}</li>`).join("")
+    : "<li>No problems this time.</li>";
+
+  const rm = m.real_mission;
+  const real = rm ? `<p><strong>${rm.name}:</strong> ${rm.days >= 1000 ? `about ${(rm.days / 365).toFixed(1)} years` : `${rm.days} days`} vs. your ${m.trip_days} days. ${rm.note}</p>` : "";
+
+  $("report").innerHTML = `
+    <h3>Mission report: ${m.planet}</h3>
+    <p class="report-verdict ${goodPlan ? "good" : "bad"}">
+      ${goodPlan ? `Your plan worked: you packed everything ${m.planet} needs${spare > 0 ? `, with ${spare} spare points for problems` : ""}.`
+                 : "Your plan was missing something. Compare what you packed with what was needed:"}
+    </p>
+    <div class="table-wrap"><table class="report-table">
+      <tr><th>Supply</th><th>You packed</th><th>Needed</th><th></th></tr>${rows}
+    </table></div>
+    <h4>What the NASA data taught you</h4>
+    <ul>
+      <li>${m.planet}’s gravity is ${m.gravity} m/s², so landing and taking off took ${need.fuel} fuel. Stronger gravity, more fuel.</li>
+      <li>It’s ${m.sma_au} AU from the Sun, so the round trip took ${need.food} food. Farther away, more food.</li>
+      <li>It goes from ${m.temp_min} to ${m.temp_max} °C, so it needed: ${gearText(need.heater, need.cooler).toLowerCase()}.</li>
+      <li>A fuel-saving Hohmann transfer takes ${m.trip_days} days each way.</li>
+    </ul>
+    <h4>Problems you faced</h4>
+    <ul>${problems}</ul>
+    ${quizScore ? `<p><strong>Boss quiz:</strong> ${quizScore} correct.</p>` : ""}
+    <h4>How a real NASA mission compares</h4>
+    ${real}
+  `;
+}
+
+// ---------- 9. the boss decides ----------
 
 // The boss's words. Change these to whatever your team wants.
 const BOSS = {
@@ -696,6 +759,8 @@ function endMission(success, text) {
   $("result-title").className = `verdict ${success ? "good" : "bad"}`;
   $("result-title").hidden = true;
   $("result-btn").hidden = true;
+  $("report").hidden = true;
+  renderReport(success);
 
   // the boss "talks": the words appear one letter at a time
   const speech = `${text} ${lines.join(" ")}`;
@@ -709,6 +774,7 @@ function endMission(success, text) {
       clearInterval(typing);
       $("result-title").hidden = false;
       $("result-btn").hidden = false;
+      $("report").hidden = false;
     }
   }, 22);
   log(success ? `The boss says: you keep your job.` : `The boss says: you're fired.`, success ? "good" : "bad");
