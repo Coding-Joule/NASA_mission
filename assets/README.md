@@ -41,7 +41,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 | ☐ | `disasters/asteroid.png` | An asteroid flying at you | Flight to Europa |
 | ✓ | `disasters/air-leak.jpg` | Done: crack with air swirling out | Any flight |
 | ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
-| ☐ | `disasters/solar-panel.png` | A broken solar panel | Any flight |
+| ✓ | `disasters/solar-panel.png` | Done: cracked solar panel | Any flight |
 | ☐ | `disasters/dust-storm.png` | A big dust storm | On Mars |
 | ☐ | `disasters/moon-dust.png` | Dusty, jammed tools | On the Moon |
 | ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
