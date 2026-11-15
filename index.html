@@ -6,7 +6,7 @@
   <title>NASA Mission</title>
   <!-- When you change any .js or .css file, change the ?v=... number below too,
        so browsers load the new files instead of old saved copies. -->
-  <link rel="stylesheet" href="css/style.css?v=20261114c">
+  <link rel="stylesheet" href="css/style.css?v=20261114d">
 </head>
 <body>
 
@@ -43,10 +43,10 @@
       </p>
       <ol class="how">
         <li><strong>Read the briefing.</strong> Real NASA numbers tell you how hard each world is.</li>
-        <li><strong>Load the rocket.</strong> Split 100 mission points between fuel and food. Stronger gravity needs more fuel, and longer trips need more food.</li>
-        <li><strong>Fly and land.</strong> Run out of food and the crew starves; run out of fuel and you crash. Watch out for disasters: fix them, or ignore them and lose the mission.</li>
+        <li><strong>Load the rocket.</strong> The rocket only has room for so much. Work out the fuel to land <em>and</em> take off, food for <em>both</em> ways, and whether you need a heater or a cooler.</li>
+        <li><strong>Fly and land.</strong> Run out of food and the crew starves; run out of fuel and you crash. Disasters will happen, and you only get 10 seconds to decide: fix them, or lose the mission.</li>
         <li><strong>Collect the science.</strong> Play mini games to drill rocks, snap pictures and scoop the ground before time runs out: 3 minutes, then 2, then 1.</li>
-        <li><strong>Fly home and face the boss.</strong> Pass the boss's quiz about the NASA data to keep your job.</li>
+        <li><strong>Take off, fly home and face the boss.</strong> Get 3 of 4 right on the boss's quiz about the NASA data to keep your job.</li>
       </ol>
       <h2 class="wi-title">What if…? Solve real space problems</h2>
       <p class="hint">Each one is a real problem NASA faced. Pick how you'd solve it, then see what NASA really did.</p>
@@ -90,6 +90,19 @@
           <button data-step="1">+1</button><button data-step="5">+5</button>
         </div>
       </div>
+
+      <div class="load-row">
+        <div>
+          <strong>Heater and cooler</strong>
+          <p class="hint" id="gear-hint"></p>
+        </div>
+        <div class="gear">
+          <span>Heater</span><button class="toggle" id="load-heater" aria-pressed="false">Not packed</button>
+          <span>Cooler</span><button class="toggle" id="load-cooler" aria-pressed="false">Not packed</button>
+        </div>
+      </div>
+
+      <p class="hint warn">Problems will happen on the way there, on the surface and on the way home. Leave some spare fuel and food to fix them.</p>
 
       <div class="row">
         <button class="ghost" id="back-brief">Back</button>
@@ -139,7 +152,7 @@
           <p class="quiz-q" id="quiz-q"></p>
         </div>
       </div>
-      <p class="hint">Before I decide, a quick quiz. Get 2 right to keep your job.</p>
+      <p class="hint">Before I decide, a quick quiz. Get 3 of 4 right to keep your job.</p>
       <div class="options" id="quiz-options"></div>
       <p class="quiz-why" id="quiz-why" aria-live="polite"></p>
       <div class="row"><button class="go" id="quiz-next" hidden>Next question</button></div>
@@ -181,10 +194,10 @@
     <div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div>
   </div>
 
-  <script src="js/captions.js?v=20261114c"></script>
-  <script src="js/disasters.js?v=20261114c"></script>
-  <script src="js/minigames.js?v=20261114c"></script>
-  <script src="js/quiz.js?v=20261114c"></script>
-  <script src="js/mission.js?v=20261114c"></script>
+  <script src="js/captions.js?v=20261114d"></script>
+  <script src="js/disasters.js?v=20261114d"></script>
+  <script src="js/minigames.js?v=20261114d"></script>
+  <script src="js/quiz.js?v=20261114d"></script>
+  <script src="js/mission.js?v=20261114d"></script>
 </body>
 </html>

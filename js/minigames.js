@@ -9,11 +9,11 @@
 // done(true) when the sample is collected, or done(false) if you back out.
 
 const MINI = {
-  rock:    { title: "Drill the rock",   how: "Click DRILL 8 times to drill out a rock core.", clicks: 8,
+  rock:    { title: "Drill the rock",   how: "Click DRILL 12 times to drill out a rock core.", clicks: 12,
              learn: "NASA's Perseverance rover drills out rock cores about the size of a piece of chalk." },
   picture: { title: "Take the picture", how: "Click SNAP when the moving marker is inside the green box.",
              learn: "Rovers have lots of cameras. Perseverance has 23 of them." },
-  ground:  { title: "Scoop the ground", how: "Press and hold SCOOP until the bar is full. Let go too early and you spill it.", holdSeconds: 2,
+  ground:  { title: "Scoop the ground", how: "Press and hold SCOOP until the bar is full. Let go too early and you spill it.", holdSeconds: 3,
              learn: "NASA's Phoenix lander scooped Martian soil with its robotic arm and found water ice just under the surface in 2008." },
 };
 
@@ -48,7 +48,7 @@ function playMiniGame(kind, done) {
 
   if (kind === "picture") {
     const zone = 20 + Math.random() * 55;          // where the green box starts (%)
-    const width = 18;                              // how wide the green box is (%)
+    const width = 12;                              // how wide the green box is (%)
     area.innerHTML = `<div class="track" id="mini-track">
                         <div class="target" style="left:${zone}%;width:${width}%"></div>
                         <div class="marker" id="mini-marker"></div>
@@ -58,7 +58,7 @@ function playMiniGame(kind, done) {
     let pos = 0, dir = 1, last = performance.now(), alive = true;
     const step = (now) => {
       if (!alive) return;
-      pos += dir * ((now - last) / 1000) * 70;     // 70% of the track per second
+      pos += dir * ((now - last) / 1000) * 110;    // 110% of the track per second
       last = now;
       if (pos > 100) { pos = 100; dir = -1; }
       if (pos < 0) { pos = 0; dir = 1; }

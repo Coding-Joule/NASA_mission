@@ -1,9 +1,11 @@
 // A real mission, from start to finish:
 //   1. Briefing  – where you're going and the NASA numbers
-//   2. Load      – split the mission points between fuel and food
-//   3. Fly       – the trip eats food (farther = more food)
+//   2. Load      – fit fuel, food, a heater and a cooler into the rocket
+//   3. Fly       – the trip eats food (farther = more food); disasters happen
 //   4. Land      – landing burns fuel (stronger gravity = more fuel)
-//   5. Result    – success, or failed with the reason
+//   5. Surface   – mini games to collect samples; the right heater/cooler keeps you alive
+//   6. Home      – taking off burns fuel again, and the trip home eats food again
+//   7. Quiz      – the boss checks what you learned
 // Numbers come from data/game_data.json.
 
 const $ = (id) => document.getElementById(id);
@@ -11,9 +13,9 @@ const $ = (id) => document.getElementById(id);
 // Backup copy of data/game_data.json, used if the file can't load
 // (for example when index.html is opened by double-clicking).
 const BACKUP_LEVELS = [
-  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  fuel: 16,  food: 10 },
-  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  fuel: 37,  food: 15 },
-  { level: 3, minutes: 1, planet: "Europa",  distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 1.31, temperature: -160, fuel: 13,  food: 52 },
+  { level: 1, minutes: 3, planet: "Moon",    distance: 149.6, from_earth: 0.384, sma_au: 1.0,      period_days: null,    trip_days: 3, gravity: 1.6,  temperature: -20,  temp_min: -130, temp_max: 120, fuel: 16, food: 10, budget: 85 },
+  { level: 2, minutes: 2, planet: "Mars",    distance: 228.0, from_earth: 78.4,  sma_au: 1.523679, period_days: 686.971, gravity: 3.7,  temperature: -65,  temp_min: -153, temp_max: 20,  fuel: 37, food: 15, budget: 130 },
+  { level: 3, minutes: 1, planet: "Europa",  distance: 778.5, from_earth: 628.9, sma_au: 5.2044,   period_days: 4332.59, gravity: 1.31, temperature: -160, temp_min: -220, temp_max: -160, fuel: 13, food: 52, budget: 155 },
 ];
 const BACKUP_EARTH = { sma_au: 1.0, period_days: 365.25638 };
 
@@ -29,7 +31,11 @@ function hohmannDays(planetAU, earth) {
 
 let earth = BACKUP_EARTH;
 
-const BUDGET = 100;          // mission points to split between fuel and food
+// Rules (change to tune how hard it is)
+const COLD = -50;            // °C: colder than this at any time -> you need a heater
+const HOT = 50;              // °C: hotter than this at any time -> you need a cooler
+const GEAR_COST = 10;        // points for a heater, and for a cooler
+const budgetOf = (m) => m.budget || 100;
 const BASE_SECONDS = 2;      // trip time on screen: 2 s + 1 s per 120 million km
 const KM_PER_SECOND = 120;
 const LANDING_SECONDS = 2;   // how long the landing burn takes on screen
@@ -45,7 +51,7 @@ const SPOTS_PER_TYPE = 4;    // how many spots of each kind appear on the surfac
 
 let levels = [];
 let index = 0;               // which mission we're on
-let load = { fuel: 0, food: 0 };
+let load = { fuel: 0, food: 0, heater: false, cooler: false };
 let missionStart = 0;
 let clockTimer = null;
 
@@ -153,10 +159,13 @@ function startBriefing() {
     ["Distance from Sun", `${m.sma_au} AU`],
     ["Trip time", `${m.trip_days} days`],
     ["Gravity", `${m.gravity} m/s²`],
-    ["Mean temperature", `${m.temperature} °C`],
+    ["Temperature", `${m.temp_min} to ${m.temp_max} °C`],
+    ["Rocket space", `${budgetOf(m)} points`],
   ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
   $("brief-goal").textContent =
-    `Fly to ${m.planet} and land safely. You have ${BUDGET} mission points to spend on fuel and food.`;
+    `Fly to ${m.planet}, land, collect the science, take off again and fly home. ` +
+    `Your rocket only has room for ${budgetOf(m)} points of fuel, food and gear, ` +
+    `so work out exactly what you need, and save a little for problems.`;
 
   $("log").replaceChildren();
   log(`Mission ${m.level} briefing: destination ${m.planet}.`);
@@ -166,25 +175,39 @@ function startBriefing() {
 
 // ---------- 2. load ----------
 
+function needsHeater(m) { return m.temp_min < COLD; }
+function needsCooler(m) { return m.temp_max > HOT; }
+function used() { return load.fuel + load.food + (load.heater ? GEAR_COST : 0) + (load.cooler ? GEAR_COST : 0); }
+
 function startLoad() {
   const m = mission();
-  load = { fuel: 0, food: 0 };
+  load = { fuel: 0, food: 0, heater: false, cooler: false };
   $("fuel-hint").textContent =
-    `Landing burns 10 fuel for every 1 m/s² of gravity. ${m.planet}'s gravity is ${m.gravity} m/s².`;
+    `Landing burns 10 fuel for every 1 m/s² of gravity, and taking off again burns the same. ` +
+    `${m.planet}'s gravity is ${m.gravity} m/s².`;
   $("food-hint").textContent =
-    `The crew eats 10 food for every 1 AU of the planet's distance from the Sun. ` +
-    `${m.planet} is ${m.sma_au} AU from the Sun, and the trip takes ${m.trip_days} days.`;
+    `The crew eats 10 food for every 1 AU of distance from the Sun, on the way there and again on the way home. ` +
+    `${m.planet} is ${m.sma_au} AU from the Sun.`;
+  $("gear-hint").textContent =
+    `Bring a heater if it ever gets colder than ${COLD} °C, and a cooler if it ever gets hotter than ${HOT} °C. ` +
+    `Each costs ${GEAR_COST} points. ${m.planet} goes from ${m.temp_min} to ${m.temp_max} °C.`;
   updateLoad();
   showPhase("load");
   setCaptions("load");
 }
 
 function updateLoad() {
-  const used = load.fuel + load.food;
+  const m = mission();
   $("load-fuel").textContent = load.fuel;
   $("load-food").textContent = load.food;
-  $("budget-text").textContent = `${BUDGET - used} of ${BUDGET} mission points left`;
-  $("launch").disabled = used === 0;
+  ["heater", "cooler"].forEach((k) => {
+    const b = $(`load-${k}`);
+    b.textContent = load[k] ? `Packed (${GEAR_COST})` : "Not packed";
+    b.classList.toggle("on", load[k]);
+    b.setAttribute("aria-pressed", load[k]);
+  });
+  $("budget-text").textContent = `${budgetOf(m) - used()} of ${budgetOf(m)} points of rocket space left`;
+  $("launch").disabled = used() === 0;
 }
 
 document.querySelectorAll(".stepper").forEach((stepper) => {
@@ -192,11 +215,18 @@ document.querySelectorAll(".stepper").forEach((stepper) => {
   stepper.querySelectorAll("button").forEach((b) => {
     b.onclick = () => {
       const step = Number(b.dataset.step);
-      const room = BUDGET - load.fuel - load.food;
+      const room = budgetOf(mission()) - used();
       load[key] += step > 0 ? Math.min(step, room) : Math.max(step, -load[key]);
       updateLoad();
     };
   });
+});
+["heater", "cooler"].forEach((k) => {
+  $(`load-${k}`).onclick = () => {
+    if (!load[k] && used() + GEAR_COST > budgetOf(mission())) return;   // no room
+    load[k] = !load[k];
+    updateLoad();
+  };
 });
 
 // ---------- popup (used by disasters and mini games) ----------
@@ -221,12 +251,30 @@ function costText(cost) {
 }
 
 // Pick a disaster for this part of the mission, or null for no disaster.
+// The same problem never happens twice in one mission.
+let usedDisasters = new Set();
 function pickDisaster(part) {
   if (Math.random() >= DISASTER_CHANCE) return null;
   const m = mission();
-  const options = DISASTERS[part].filter((d) => !d.where || d.where.includes(m.planet));
-  return options.length ? options[Math.floor(Math.random() * options.length)] : null;
+  const options = DISASTERS[part].filter((d) =>
+    (!d.where || d.where.includes(m.planet)) && !usedDisasters.has(d.id));
+  if (!options.length) return null;
+  const d = options[Math.floor(Math.random() * options.length)];
+  usedDisasters.add(d.id);
+  return d;
 }
+
+// Pick n disasters spread out over a flight (as points between 0 and 1).
+function planDisasters(part, n) {
+  const plan = [];
+  for (let i = 0; i < n; i++) {
+    const d = pickDisaster(part);
+    if (d) plan.push({ d, at: (i + 0.25 + Math.random() * 0.5) / n });
+  }
+  return plan;
+}
+
+let decisionTimer = null;
 
 // Show a disaster. have = what the player has, e.g. { fuel: 10, food: 4 } or { seconds: 50 }.
 function showDisaster(d, have, onFix, onIgnore) {
@@ -245,18 +293,33 @@ function showDisaster(d, have, onFix, onIgnore) {
     <p class="learn"><strong>Did you know?</strong> ${d.learn}</p>
     <p class="hint">${canFix ? `Fixing it costs ${costText(d.cost)}.`
                              : `Fixing it costs ${costText(d.cost)}, and you don't have enough left.`}</p>
+    <p class="decide">Decide in <strong id="decide-left">${DECISION_SECONDS}</strong> seconds!</p>
     <div class="row">
       <button class="go" id="fix" ${canFix ? "" : "disabled"}>${d.fix}</button>
       <button class="ghost danger" id="ignore">Ignore it</button>
     </div>
   `, "disaster-box");
+  let secs = DECISION_SECONDS;
+  clearInterval(decisionTimer);
+  decisionTimer = setInterval(() => {
+    secs -= 1;
+    $("decide-left").textContent = secs;
+    if (secs <= 0) {
+      clearInterval(decisionTimer);
+      closeModal();
+      log(`Took too long to decide.`, "bad");
+      onIgnore(`You took too long to decide. ${d.ignore} In space, problems don't wait.`);
+    }
+  }, 1000);
   $("fix").onclick = () => {
+    clearInterval(decisionTimer);
     closeModal();
     paused = false;
     log(`Fixed: ${d.fix.toLowerCase()} (${costText(d.cost)}).`);
     onFix(d.cost);
   };
   $("ignore").onclick = () => {
+    clearInterval(decisionTimer);
     closeModal();
     log(`Ignored the problem.`, "bad");
     onIgnore(`${d.ignore} Ignoring problems in space can end a mission.`);
@@ -273,6 +336,7 @@ function launch() {
   clockTimer = setInterval(() => ($("clock").textContent = `T+ ${elapsed()}`), 250);
   tank = { fuel: load.fuel, food: load.food };
   paused = false;
+  usedDisasters = new Set();
 
   log(`Loaded ${load.fuel} fuel and ${load.food} food.`);
   log(`Liftoff! Heading for ${m.planet}.`, "good");
@@ -280,9 +344,8 @@ function launch() {
   setCaptions("fly");
 
   const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
-  const disaster = pickDisaster("flight");
-  const disasterAt = 0.3 + Math.random() * 0.4;    // somewhere in the middle of the trip
-  let t = 0, last = performance.now(), halfwayLogged = false, disasterDone = !disaster, over = false;
+  const problems = planDisasters("flight", FLIGHT_DISASTERS_THERE);
+  let t = 0, last = performance.now(), halfwayLogged = false, over = false;
 
   function frame(now) {
     if (over) return;
@@ -305,9 +368,10 @@ function launch() {
       halfwayLogged = true;
       log(`Day ${Math.round(m.trip_days / 2)}: halfway there. ${Math.round(foodLeft)} food left.`);
     }
-    if (!disasterDone && t >= disasterAt) {
-      disasterDone = true;
-      showDisaster(disaster, { fuel: tank.fuel, food: foodLeft },
+    const next = problems.find((p) => !p.done && t >= p.at);
+    if (next && !paused) {
+      next.done = true;
+      showDisaster(next.d, { fuel: tank.fuel, food: foodLeft },
         (cost) => { tank.fuel -= cost.fuel || 0; tank.food -= cost.food || 0; },
         (why) => { over = true; endMission(false, why); });
     }
@@ -342,6 +406,16 @@ function land(foodLeft) {
     }
     log(`Touchdown on ${m.planet}!`, "good");
     left = { fuel: fuelLeft, food: foodLeft };
+    if (needsHeater(m) && !load.heater) {
+      log(`No heater. Equipment freezing.`, "bad");
+      return endMission(false, `It gets down to ${m.temp_min} °C on ${m.planet}, and you didn't bring a heater. ` +
+        `Your equipment froze solid.`);
+    }
+    if (needsCooler(m) && !load.cooler) {
+      log(`No cooler. Equipment overheating.`, "bad");
+      return endMission(false, `It gets up to ${m.temp_max} °C on ${m.planet}, and you didn't bring a cooler. ` +
+        `The sun cooked your batteries.`);
+    }
     startSurface();
   }
   requestAnimationFrame(frame);
@@ -465,25 +539,66 @@ let left = { fuel: 0, food: 0 };   // what's left in the tanks after landing
 
 function flyHome(passed, report) {
   const m = mission();
-  log(`Lifting off from ${m.planet}. Heading home to Earth.`);
+  log(`Lifting off from ${m.planet}. Takeoff burns ${m.fuel} fuel.`);
   showPhase("fly");
   setCaptions("home");
-  const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
+  paused = false;
+
+  // 1) take off: needs the same fuel as landing
+  const fuelLastsUntil = Math.min(left.fuel / m.fuel, 1);
   const start = performance.now();
-
-  function frame(now) {
-    const t = Math.min((now - start) / duration, 1);
-    const progress = 1 - t;                       // 1 = at the planet, 0 = back at Earth
-    drawGauges(left.fuel, left.food, m.from_earth * progress);
-    drawDay(t, m.trip_days, "home");
-    moveRocket(progress, 0, true);
-    if (t < 1) return requestAnimationFrame(frame);
-
-    log(`Splashdown! Back on Earth. Reporting to the boss.`, "good");
-    if (passed) startQuiz(report);
-    else endMission(false, report);
+  function takeoff(now) {
+    const p = Math.min((now - start) / (LANDING_SECONDS * 1000), fuelLastsUntil);
+    drawGauges(left.fuel - m.fuel * p, left.food, 0);
+    moveRocket(1, 40 * (1 - p));
+    if (p < fuelLastsUntil) return requestAnimationFrame(takeoff);
+    if (fuelLastsUntil < 1) {
+      log(`Not enough fuel to take off.`, "bad");
+      return endMission(false, `Taking off from ${m.planet} needs ${m.fuel} fuel, but you only had ` +
+        `${Math.max(0, Math.round(left.fuel))} left. Your crew is stranded.`);
+    }
+    left.fuel -= m.fuel;
+    cruise();
   }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(takeoff);
+
+  // 2) fly home: eats the same food as the trip there
+  function cruise() {
+    log(`Heading home to Earth.`);
+    const duration = (BASE_SECONDS + m.from_earth / KM_PER_SECOND) * 1000;
+    const problems = planDisasters("flight", FLIGHT_DISASTERS_HOME);
+    let t = 0, last = performance.now(), over = false;
+    function frame(now) {
+      if (over) return;
+      if (!paused) t = Math.min(1, t + (now - last) / duration);
+      last = now;
+      const foodLeft = left.food - m.food * t;
+      drawGauges(left.fuel, foodLeft, m.from_earth * (1 - t));
+      drawDay(t, m.trip_days, "home");
+      moveRocket(1 - t, 0, true);
+
+      if (foodLeft < -0.001) {
+        over = true;
+        const day = Math.max(1, Math.round(m.trip_days * t));
+        log(`Day ${day} of the trip home: out of food.`, "bad");
+        return endMission(false, `On day ${day} of the trip home, your crew ran out of food. ` +
+          `Remember: the trip home eats food too.`);
+      }
+      const next = problems.find((p) => !p.done && t >= p.at);
+      if (next && !paused) {
+        next.done = true;
+        showDisaster(next.d, { fuel: left.fuel, food: foodLeft },
+          (cost) => { left.fuel -= cost.fuel || 0; left.food -= cost.food || 0; },
+          (why) => { over = true; endMission(false, why); });
+      }
+      if (t < 1) return requestAnimationFrame(frame);
+
+      log(`Splashdown! Back on Earth. Reporting to the boss.`, "good");
+      if (passed) startQuiz(report);
+      else endMission(false, report);
+    }
+    requestAnimationFrame(frame);
+  }
 }
 
 // "Day 130 of 259" during a flight
@@ -569,6 +684,7 @@ let typing = null;
 function endMission(success, text) {
   clearInterval(clockTimer);
   clearInterval(surfaceTimer);
+  clearInterval(decisionTimer);
   stopMini();
   closeModal();
   paused = false;

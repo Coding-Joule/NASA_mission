@@ -4,8 +4,8 @@
 //
 // QUIZ_LENGTH questions per mission; you need QUIZ_PASS right to keep your job.
 
-const QUIZ_LENGTH = 3;
-const QUIZ_PASS = 2;
+const QUIZ_LENGTH = 4;
+const QUIZ_PASS = 3;
 
 // Extra fact questions for each world (edit freely; first answer = correct).
 const QUIZ_FACTS = {
@@ -40,6 +40,11 @@ function numberQuestion(q, m, all, key, unit, why) {
   return { q, a: [right, ...wrong.slice(0, 2)], why };
 }
 
+function gearAnswer(m) {
+  const h = m.temp_min < COLD, c = m.temp_max > HOT;
+  return h && c ? "A heater and a cooler" : h ? "Just a heater" : c ? "Just a cooler" : "Neither";
+}
+
 function buildQuiz(m, all) {
   const dataQuestions = [
     numberQuestion(`What is ${m.planet}'s gravity?`, m, all, "gravity", " m/s²",
@@ -52,10 +57,13 @@ function buildQuiz(m, all) {
       a: [`Its gravity is ${m.gravity} m/s², and stronger gravity needs more fuel`,
           "Because it's far from the Sun", "Because it's very cold"],
       why: "Landing fuel depends on gravity: stronger gravity pulls harder, so you need more fuel to slow down." },
-    { q: `Why did the trip to ${m.planet} need ${m.food} food?`,
+    { q: `Why did each way of the trip to ${m.planet} need ${m.food} food?`,
       a: [`It's ${m.sma_au} AU from the Sun, and farther trips need more food`,
           "Because its gravity is strong", "Because it's hot there"],
       why: "Food depends on distance: the farther the trip, the longer the crew needs to eat." },
+    { q: `Which temperature gear did ${m.planet} need?`,
+      a: [gearAnswer(m), ...["A heater and a cooler", "Just a heater", "Just a cooler", "Neither"].filter((x) => x !== gearAnswer(m)).slice(0, 2)],
+      why: `${m.planet} goes from ${m.temp_min} to ${m.temp_max} °C. Below ${COLD} °C you need a heater; above ${HOT} °C you need a cooler.` },
   ];
   const facts = QUIZ_FACTS[m.planet] || [];
   // mostly data questions, plus one fact question if there is one
