@@ -29,8 +29,8 @@ Crop each planet so it fills the square. The game shows it about 140 px wide.
 | ✓ | `rocket.png` | Your rocket, **pointing right** → | Flies along the path | About 256 × 256, transparent background. The game flips it for the trip home and turns it for landing. |
 | ✓ | `boss.png` + `boss-intro.png` | The boss character | Boss screen, next to the speech bubble | Square, about 400 × 400. Face and shoulders are enough. |
 | ✓ | `surface/rock.png` | Done: real NASA Moon rock photo | Surface spots | Square, about 256 × 256, transparent background |
-| ☐ | `surface/picture.png` | A camera or photo icon | Surface spots | Square, about 256 × 256, transparent background |
-| ☐ | `surface/ground.png` | A patch of ground or soil, or a scoop | Surface spots | Square, about 256 × 256, transparent background |
+| ✓ | `surface/picture.jpg` | Done: NASA photo of Perseverance's Mastcam-Z camera | Surface spots | Square, about 256 × 256, transparent background |
+| ✓ | `surface/ground.jpg` | Done: NASA photo of Martian soil in Phoenix's scoop | Surface spots | Square, about 256 × 256, transparent background |
 
 ### Disaster pictures (drawn by the team)
 
@@ -70,6 +70,14 @@ These aren't used yet. Draw them if you have time.
 |---|---|---|
 | `title.png` | Game logo / title art | Start screen |
 
+### NASA ground photos (behind the collecting screen)
+
+| ✓ | File | What it is |
+|---|---|---|
+| ✓ | `surface/moon-ground.jpg` | Apollo 11 bootprint on the Moon (AS11-40-5878) |
+| ✓ | `surface/mars-ground.jpg` | Perseverance's first color view of Mars (PIA24430) |
+| ✓ | `surface/europa-ground.jpg` | Galileo close-up of Europa's icy surface (PIA00592) |
+
 ## Credits (fill this in, because judges check it)
 
 The submission must cite every image. For each NASA image, write its title and link.
@@ -82,8 +90,11 @@ The submission must cite every image. For each NASA image, write its title and l
 | `planets/europa.jpg` | NASA's Juno Mission Captures Images of Europa (PIA25695) | https://science.nasa.gov/wp-content/uploads/2024/07/pia25695-nasas-juno-mission-captures-images-of-europa.jpg | NASA |
 | `rocket.png` | | | [team member] |
 | `boss.png` | | | [team member] |
+| `surface/moon-ground.jpg` | Bootprint on the Lunar Surface (Apollo 11, AS11-40-5878) | https://www.nasa.gov/image-article/bootprint-lunar-surface/ | NASA |
+| `surface/mars-ground.jpg` | Perseverance's first color view of Mars (PIA24430), from "Advances in NASA Imaging Changed How World Sees Mars" | https://www.nasa.gov/solar-system/planets/mars/advances-in-nasa-imaging-changed-how-world-sees-mars/ | NASA/JPL-Caltech |
+| `surface/europa-ground.jpg` | Close-up of Europa's Surface (Galileo, PIA00592) | https://science.nasa.gov/missions/europa-clipper/europa-clipper-resources/close-up-of-europas-surface/ | NASA/JPL |
 | `surface/rock.png` | Apollo Moon rock (NASA photo, background removed) | https://www.nasa.gov/wp-content/uploads/2019/07/d_2c-xhwkaasmci.jpg | NASA |
-| `surface/picture.png` | | | [team member] |
-| `surface/ground.png` | | | [team member] |
+| `surface/picture.jpg` | Mastcam-Z (PIA22101) | https://images.nasa.gov/details/PIA22101 | NASA/JPL-Caltech |
+| `surface/ground.jpg` | Martian Soil Inside Phoenix Robotic Arm Scoop (PIA10745) | https://images.nasa.gov/details/PIA10745 | NASA/JPL-Caltech/University of Arizona |
 
 NASA images are generally free to use; see https://www.nasa.gov/nasa-brand-center/images-and-media/

@@ -436,3 +436,10 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 .thrust-zone { position: absolute; left: 0; right: 0; background: rgba(111, 211, 143, 0.4); border-top: 2px solid var(--food); border-bottom: 2px solid var(--food); }
 .thrust-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--fuel); opacity: 0.85; }
 #tbtn { touch-action: none; user-select: none; }
+
+/* real NASA ground photo behind the sample spots */
+.spots { padding: 14px; border-radius: 12px; background-color: #2a2f3f; background-size: cover; background-position: center; }
+.spot { background: rgba(7, 11, 26, 0.6); backdrop-filter: blur(1px); }
+
+/* photo icons on the sample spots */
+.spot img { border-radius: 8px; }

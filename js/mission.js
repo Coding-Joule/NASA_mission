@@ -495,6 +495,9 @@ function startSurface() {
 
   const box = $("spots");
   box.replaceChildren();
+  // a real NASA close-up of this world's ground behind the sample spots
+  box.style.backgroundImage =
+    `linear-gradient(rgba(7, 11, 26, 0.35), rgba(7, 11, 26, 0.55)), url("assets/surface/${m.planet.toLowerCase()}-ground.jpg")`;
   kinds.forEach((kind) => {
     const s = SAMPLES[kind];
     const spot = document.createElement("button");
