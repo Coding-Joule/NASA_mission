@@ -28,7 +28,7 @@ Crop each planet so it fills the square. The game shows it about 140 px wide.
 |---|---|---|---|---|
 | ☐ | `rocket.png` | Your rocket, **pointing right** → | Flies along the path | About 256 × 256, transparent background. The game flips it for the trip home and turns it for landing. |
 | ☐ | `boss.png` | The boss character | Boss screen, next to the speech bubble | Square, about 400 × 400. Face and shoulders are enough. |
-| ☐ | `surface/rock.png` | A rock to collect | Surface spots | Square, about 256 × 256, transparent background |
+| ✓ | `surface/rock.png` | Done: real NASA Moon rock photo | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/picture.png` | A camera or photo icon | Surface spots | Square, about 256 × 256, transparent background |
 | ☐ | `surface/ground.png` | A patch of ground or soil, or a scoop | Surface spots | Square, about 256 × 256, transparent background |
 
@@ -82,7 +82,7 @@ The submission must cite every image. For each NASA image, write its title and l
 | `planets/europa.jpg` | NASA's Juno Mission Captures Images of Europa (PIA25695) | https://science.nasa.gov/wp-content/uploads/2024/07/pia25695-nasas-juno-mission-captures-images-of-europa.jpg | NASA |
 | `rocket.png` | | | [team member] |
 | `boss.png` | | | [team member] |
-| `surface/rock.png` | | | [team member] |
+| `surface/rock.png` | Apollo Moon rock (NASA photo, background removed) | https://www.nasa.gov/wp-content/uploads/2019/07/d_2c-xhwkaasmci.jpg | NASA |
 | `surface/picture.png` | | | [team member] |
 | `surface/ground.png` | | | [team member] |
 

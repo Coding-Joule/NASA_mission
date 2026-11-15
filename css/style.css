@@ -246,19 +246,29 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 /* what-if cards */
 .wi-title { margin: 8px 0 0; font-size: 22px; }
 .what-ifs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.what-ifs { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .what-if {
-  display: grid; gap: 8px; text-align: left;
+  display: grid; gap: 10px; align-content: start;
   padding: 14px; border-radius: 10px;
-  font: inherit; color: var(--text);
   background: rgba(255, 255, 255, 0.04);
   border: 1px dashed var(--dim);
-  cursor: pointer;
 }
-.what-if:hover { border-color: var(--fuel); }
-.wi-q { font-weight: 700; }
-.wi-a { display: none; color: var(--dim); font-size: 14px; }
 .what-if.open { border-style: solid; border-color: var(--fuel); }
-.what-if.open .wi-a { display: block; }
+.wi-q { margin: 0; font-weight: 700; }
+.wi-options { display: grid; gap: 6px; }
+.wi-option {
+  text-align: left; padding: 8px 10px; border-radius: 6px;
+  font: 14px system-ui, sans-serif; color: var(--text);
+  background: transparent; border: 1px solid var(--dim); cursor: pointer;
+}
+.wi-option:hover:not(:disabled) { border-color: var(--text); }
+.wi-option:disabled { cursor: default; }
+.wi-option.right { border-color: var(--food); background: rgba(111, 211, 143, 0.15); }
+.wi-option.wrong { border-color: #ff6b7a; background: rgba(255, 107, 122, 0.15); }
+.wi-why, .wi-real { margin: 0; font-size: 14px; }
+.wi-why:empty, .wi-real:empty { display: none; }
+.wi-real { color: var(--dim); }
+.wi-real strong { color: var(--dist); }
 
 /* popup */
 .modal {

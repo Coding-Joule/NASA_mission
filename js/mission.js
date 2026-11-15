@@ -642,11 +642,31 @@ function showIntro() {
   moveRocket(0);
   $("log").replaceChildren();
   $("what-ifs").replaceChildren(...WHAT_IFS.map((w) => {
-    const b = document.createElement("button");
-    b.className = "what-if";
-    b.innerHTML = `<span class="wi-q">${w.q}</span><span class="wi-a">${w.a}</span>`;
-    b.onclick = () => b.classList.toggle("open");
-    return b;
+    const card = document.createElement("div");
+    card.className = "what-if";
+    card.innerHTML = `<p class="wi-q">${w.q}</p><div class="wi-options"></div>
+                      <p class="wi-why" aria-live="polite"></p><p class="wi-real"></p>`;
+    w.options.forEach((opt, i) => {
+      const b = document.createElement("button");
+      b.className = "wi-option";
+      b.textContent = opt;
+      b.dataset.i = i;
+      b.onclick = () => {
+        card.querySelectorAll(".wi-option").forEach((x) => {
+          x.disabled = true;
+          if (Number(x.dataset.i) === w.best) x.classList.add("right");
+        });
+        if (i !== w.best) b.classList.add("wrong");
+        card.querySelector(".wi-why").textContent = `${i === w.best ? "Good solution!" : "Not quite."} ${w.why[i]}`;
+        card.querySelector(".wi-real").innerHTML = `<strong>What NASA really did:</strong> ${w.real}`;
+        card.classList.add("open");
+      };
+      card.querySelector(".wi-options").append(b);
+    });
+    // shuffle the choices so the best one isn't always first
+    const box = card.querySelector(".wi-options");
+    [...box.children].sort(() => Math.random() - 0.5).forEach((c) => box.append(c));
+    return card;
   }));
   showPhase("intro");
   setCaptions("intro");
