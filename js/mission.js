@@ -347,6 +347,10 @@ function showDisaster(d, have, onFix, onIgnore) {
   }, 1000);
   $("fix").onclick = () => {
     clearInterval(decisionTimer);
+    log(`Repairing: ${d.title}`);
+    playRepair(d, () => fixed());
+  };
+  const fixed = () => {
     closeModal();
     paused = false;
     log(`Fixed: ${d.fix.toLowerCase()} (${costText(d.cost)}).`);
@@ -559,6 +563,7 @@ function drawTimer() {
 function finishSurface() {
   clearInterval(surfaceTimer);
   stopMini();
+  stopRepair();
   closeModal();
   busy = false;
   const m = mission();
@@ -783,6 +788,7 @@ function endMission(success, text) {
   clearInterval(surfaceTimer);
   clearInterval(decisionTimer);
   stopMini();
+  stopRepair();
   closeModal();
   paused = false;
   const last = index === levels.length - 1;
