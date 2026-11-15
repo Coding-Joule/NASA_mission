@@ -616,7 +616,7 @@ function endMission(success, text) {
 
 async function loadLevels() {
   try {
-    const res = await fetch("data/game_data.json");
+    const res = await fetch("data/game_data.json", { cache: "no-cache" });   // always check for new numbers
     if (!res.ok) throw new Error(res.status);
     const json = await res.json();
     return { levels: json.levels, earth: json.earth };
