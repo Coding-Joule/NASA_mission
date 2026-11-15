@@ -92,6 +92,11 @@ function tryJpg(img) {
 function useDrawingOrPlaceholder(img) {
   const swap = () => {
     if (tryJpg(img)) return;
+    if (img.dataset.fallback && !img.dataset.usedFallback) {
+      img.dataset.usedFallback = "1";
+      img.src = img.dataset.fallback;
+      return;
+    }
     const box = document.createElement("div");
     box.className = "placeholder";
     box.textContent = img.dataset.label;
@@ -170,6 +175,16 @@ function startBriefing() {
     `Your rocket only has room for ${budgetOf(m)} points of fuel, food and gear, ` +
     `so work out exactly what you need, and save a little for problems.`;
 
+  // Field notes: every fact the boss's quiz can ask about, so it's all learnable here
+  const notes = [
+    `Gravity ${m.gravity} m/s² → landing takes ${m.fuel} fuel, and taking off takes ${m.fuel} more. Stronger gravity, more fuel.`,
+    `${m.sma_au} AU from the Sun → ${m.food} food each way. Farther away, more food.`,
+    `The trip takes ${m.trip_days} days each way on a fuel-saving Hohmann transfer.`,
+    `Temperature ${m.temp_min} to ${m.temp_max} °C → ${needsHeater(m) && needsCooler(m) ? "bring a heater and a cooler" : needsHeater(m) ? "bring a heater" : needsCooler(m) ? "bring a cooler" : "no heater or cooler needed"}.`,
+    ...(QUIZ_FACTS[m.planet] || []).map((f) => f.why),
+  ];
+  $("brief-notes").innerHTML = notes.map((n) => `<li>${n}</li>`).join("");
+
   $("log").replaceChildren();
   log(`Mission ${m.level} briefing: destination ${m.planet}.`);
   showPhase("brief");
@@ -182,9 +197,9 @@ function needsHeater(m) { return m.temp_min < COLD; }
 function needsCooler(m) { return m.temp_max > HOT; }
 function used() { return load.fuel + load.food + (load.heater ? GEAR_COST : 0) + (load.cooler ? GEAR_COST : 0); }
 
-function startLoad() {
+function startLoad(keep = false) {
   const m = mission();
-  load = { fuel: 0, food: 0, heater: false, cooler: false };
+  if (!keep) load = { fuel: 0, food: 0, heater: false, cooler: false };
   $("fuel-hint").textContent =
     `Landing burns 10 fuel for every 1 m/s² of gravity, and taking off again burns the same. ` +
     `${m.planet}'s gravity is ${m.gravity} m/s².`;
@@ -209,7 +224,13 @@ function updateLoad() {
     b.classList.toggle("on", load[k]);
     b.setAttribute("aria-pressed", load[k]);
   });
-  $("budget-text").textContent = `${budgetOf(m) - used()} of ${budgetOf(m)} points of rocket space left`;
+  const left = budgetOf(m) - used();
+  $("space-left").textContent = `${left} / ${budgetOf(m)}`;
+  $("space-fill").style.width = `${(used() / budgetOf(m)) * 100}%`;
+  $("space-meter").classList.toggle("low", left <= 10);
+  $("space-meter").classList.toggle("full", left === 0);
+  $("budget-text").textContent = left === 0 ? "The rocket is full." :
+    left <= 10 ? `Only ${left} points left. Keep some spare for problems!` : `${used()} points packed so far.`;
   $("launch").disabled = used() === 0;
 }
 
@@ -781,8 +802,8 @@ function endMission(success, text) {
 
   const btn = $("result-btn");
   if (!success) {
-    btn.textContent = "Try again";
-    btn.onclick = startBriefing;
+    btn.textContent = "Try again (keep my packing)";
+    btn.onclick = () => { startBriefing(); startLoad(true); };
   } else if (!last) {
     btn.textContent = `Next mission: ${levels[index + 1].planet}`;
     btn.onclick = () => { index += 1; startBriefing(); };
@@ -811,7 +832,47 @@ async function loadLevels() {
 document.querySelectorAll("img[data-label]").forEach(useDrawingOrPlaceholder);
 $("to-load").onclick = startLoad;
 $("back-brief").onclick = () => { showPhase("brief"); setCaptions("brief"); };
-$("launch").onclick = launch;
+$("launch").onclick = checkLaunch;
+
+// Mission Control checks the packing before launch, so players who don't
+// like doing the math still get help, and everyone sees the math.
+function checkLaunch() {
+  const m = mission();
+  const need = { fuel: 2 * m.fuel, food: 2 * m.food };
+  const spare = (load.fuel - need.fuel) + (load.food - need.food);
+  const lines = [
+    { ok: load.fuel >= need.fuel, what: "Fuel", packed: load.fuel, needed: need.fuel,
+      math: `${m.gravity} m/s² gravity × 10 = ${m.fuel} to land, + ${m.fuel} to take off = ${need.fuel}` },
+    { ok: load.food >= need.food, what: "Food", packed: load.food, needed: need.food,
+      math: `${m.sma_au} AU × 10 = ${m.food} each way, × 2 = ${need.food}` },
+  ];
+  const gearLines = [];
+  if (needsHeater(m)) gearLines.push({ ok: load.heater, text: `Heater: it gets down to ${m.temp_min} °C` });
+  if (needsCooler(m)) gearLines.push({ ok: load.cooler, text: `Cooler: it gets up to ${m.temp_max} °C` });
+  const allOk = lines.every((l) => l.ok) && gearLines.every((g) => g.ok);
+
+  const row = (l) => `<li class="${l.ok ? "ok" : "short"}">${l.ok ? "✓" : "✗"} <strong>${l.what}:</strong>
+      ${l.ok ? `${l.packed} packed, ${l.needed} needed` : `only ${l.packed} packed, but you need ${l.needed} (${l.needed - l.packed} more)`}
+      <span class="math">${l.math}</span></li>`;
+  const gearRow = (g) => `<li class="${g.ok ? "ok" : "short"}">${g.ok ? "✓" : "✗"} <strong>${g.text}</strong>${g.ok ? "" : ", not packed"}</li>`;
+  const spareMsg = !allOk ? "" : spare < 6
+    ? `<p class="hint warn">Only ${Math.max(spare, 0)} spare fuel and food for problems. Disasters usually cost 3 to 6 each.</p>`
+    : `<p class="hint">${spare} spare fuel and food for problems. Nice planning!</p>`;
+
+  openModal(`
+    <p class="eyebrow">Mission Control check</p>
+    <h3>${allOk ? "All systems go!" : "Wait! Mission Control found a problem"}</h3>
+    <ul class="check">${lines.map(row).join("")}${gearLines.map(gearRow).join("")}</ul>
+    ${spareMsg}
+    <div class="row">
+      ${allOk ? `<button class="go" id="check-go">Launch!</button><button class="ghost" id="check-back">Change my packing</button>`
+              : `<button class="go" id="check-back">Fix my packing</button><button class="ghost danger" id="check-go">Launch anyway</button>`}
+    </div>
+  `, "check-box");
+  log(allOk ? "Mission Control: all systems go." : "Mission Control found a problem with the packing.", allOk ? "good" : "bad");
+  $("check-back").onclick = closeModal;
+  $("check-go").onclick = () => { closeModal(); launch(); };
+}
 
 // ---------- intro ----------
 

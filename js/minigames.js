@@ -55,22 +55,28 @@ function playMiniGame(kind, done) {
                       </div>
                       <p class="mini-msg" id="mini-msg"></p>
                       <button class="go" id="mini-btn">SNAP</button>`;
-    let pos = 0, dir = 1, last = performance.now(), alive = true;
+    // The marker's place is worked out from the clock, not added up frame by
+    // frame, so it stays right on slow or busy computers. The press is judged
+    // at the moment the button goes down, with a little leeway.
+    const SPEED = 90;                              // % of the track per second
+    const start = performance.now();
+    const posAt = (t) => { const d = (((t - start) / 1000) * SPEED) % 200; return d <= 100 ? d : 200 - d; };
+    let alive = true;
     const step = (now) => {
       if (!alive) return;
-      pos += dir * ((now - last) / 1000) * 110;    // 110% of the track per second
-      last = now;
-      if (pos > 100) { pos = 100; dir = -1; }
-      if (pos < 0) { pos = 0; dir = 1; }
-      $("mini-marker").style.left = `${pos}%`;
+      $("mini-marker").style.left = `${posAt(now)}%`;
       requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
     miniCleanup = () => { alive = false; };
-    $("mini-btn").onclick = () => {
-      if (pos >= zone && pos <= zone + width) finish(true);
+    const snap = (e) => {
+      e.preventDefault();
+      const p = posAt(performance.now());
+      if (p >= zone - 3 && p <= zone + width + 3) finish(true);
       else $("mini-msg").textContent = "Blurry! Try again.";
     };
+    $("mini-btn").addEventListener("pointerdown", snap);
+    $("mini-btn").addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) snap(e); });
   }
 
   if (kind === "ground") {

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="The boss, pointing at the speech bubble">
+  <!-- Stand-in boss until the team draws assets/boss.png. -->
+  <!-- body / suit -->
+  <path d="M40 260 C40 196 70 168 120 168 C170 168 200 196 200 260 Z" fill="#2b3a67"/>
+  <path d="M104 170 L120 214 L136 170 Z" fill="#eef2fb"/>
+  <path d="M116 176 L124 176 L128 222 L120 236 L112 222 Z" fill="#ff8a3d"/>
+  <!-- NASA-style badge -->
+  <circle cx="160" cy="206" r="9" fill="#7fb2ff"/>
+  <!-- pointing arm (to the right, toward the bubble) -->
+  <path d="M178 196 C196 186 214 170 226 156" stroke="#2b3a67" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <circle cx="228" cy="152" r="11" fill="#f2c7a5"/>
+  <path d="M232 146 L240 136" stroke="#f2c7a5" stroke-width="7" stroke-linecap="round"/>
+  <!-- neck + head -->
+  <rect x="108" y="146" width="24" height="26" rx="8" fill="#e8b994"/>
+  <circle cx="120" cy="112" r="46" fill="#f2c7a5"/>
+  <!-- hair -->
+  <path d="M76 104 C76 70 100 58 122 58 C148 58 166 74 164 102 C154 86 136 80 120 82 C102 84 88 92 76 104 Z" fill="#3a2a22"/>
+  <!-- eyebrows (stern) -->
+  <path d="M96 100 L114 106" stroke="#3a2a22" stroke-width="5" stroke-linecap="round"/>
+  <path d="M144 100 L126 106" stroke="#3a2a22" stroke-width="5" stroke-linecap="round"/>
+  <!-- eyes -->
+  <circle cx="106" cy="116" r="5" fill="#14213d"/>
+  <circle cx="134" cy="116" r="5" fill="#14213d"/>
+  <!-- mouth -->
+  <path d="M106 140 C114 134 126 134 134 140" stroke="#8a3b2a" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- headset -->
+  <path d="M74 112 C74 66 166 66 166 112" stroke="#14213d" stroke-width="6" fill="none"/>
+  <rect x="66" y="104" width="14" height="24" rx="6" fill="#14213d"/>
+  <path d="M73 128 C76 142 88 146 98 144" stroke="#14213d" stroke-width="4" fill="none"/>
+  <circle cx="100" cy="144" r="4" fill="#ff8a3d"/>
+</svg>

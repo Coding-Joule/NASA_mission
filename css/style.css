@@ -354,3 +354,37 @@ main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; display: grid;
 .report-table th { color: var(--dim); font-weight: 600; }
 .ok { color: var(--food); font-weight: 700; white-space: nowrap; }
 .short { color: #ff6b7a; font-weight: 700; white-space: nowrap; }
+
+/* boss on the intro */
+.boss-intro { grid-template-columns: 180px minmax(0, 1fr); align-items: center; }
+.intro-story { display: grid; gap: 8px; font-size: 18px; }
+.intro-story p { margin: 0; }
+.boss-pic img { background: rgba(255, 255, 255, 0.04); border-radius: 12px; }
+
+/* rocket space meter */
+.space-meter { display: grid; gap: 8px; padding: 16px 18px; border-radius: 12px; background: rgba(127, 178, 255, 0.10); border: 2px solid var(--dist); position: sticky; top: 8px; z-index: 5; }
+.space-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 700; font-size: 18px; }
+.space-head strong { font: 700 34px Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums; color: var(--dist); }
+.space-bar { height: 18px; border-radius: 9px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.space-fill { height: 100%; width: 0; background: var(--dist); transition: width 0.2s; }
+.space-note { margin: 0; font-size: 15px; color: var(--dim); }
+.space-meter.low { border-color: var(--fuel); background: rgba(255, 138, 61, 0.12); }
+.space-meter.low .space-head strong, .space-meter.low .space-note { color: var(--fuel); }
+.space-meter.low .space-fill { background: var(--fuel); }
+.space-meter.full { border-color: #ff6b7a; }
+
+/* Mission Control check */
+.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.check li { padding: 10px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); }
+.check li.ok { border-left: 4px solid var(--food); }
+.check li.short { border-left: 4px solid #ff6b7a; }
+.check .math { display: block; margin-top: 4px; font: 14px Consolas, "Courier New", monospace; color: var(--dim); }
+
+@media (max-width: 560px) {
+  .boss-intro { grid-template-columns: 1fr; }
+}
+
+/* field notes in the briefing */
+.notes { display: grid; gap: 8px; padding: 14px 16px; border-radius: 10px; background: rgba(111, 211, 143, 0.08); border: 1px dashed var(--food); }
+.notes .eyebrow { color: var(--food); }
+.notes ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
