@@ -43,7 +43,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 | ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
 | ✓ | `disasters/solar-panel.png` | Done: cracked solar panel | Any flight |
 | ✓ | `disasters/dust-storm.png` | Done: swirling dust storm | On Mars |
-| ☐ | `disasters/moon-dust.png` | Dusty, jammed tools | On the Moon |
+| ✓ | `disasters/moon-dust.png` | Done: Moon dust cloud | On the Moon |
 | ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
 | ✓ | `disasters/ice-crack.jpg` | Done: cracking blue ice | On Europa |
 | ☐ | `disasters/equipment.png` | A bent robot arm | Any surface |
