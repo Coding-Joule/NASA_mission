@@ -45,7 +45,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 | ✓ | `disasters/dust-storm.png` | Done: swirling dust storm | On Mars |
 | ☐ | `disasters/moon-dust.png` | Dusty, jammed tools | On the Moon |
 | ☐ | `disasters/radiation.png` | A radiation warning sign | On Europa |
-| ☐ | `disasters/ice-crack.png` | Ice cracking open | On Europa |
+| ✓ | `disasters/ice-crack.jpg` | Done: cracking blue ice | On Europa |
 | ☐ | `disasters/equipment.png` | A bent robot arm | Any surface |
 
 The mini games reuse the rock, picture and ground drawings above, so they don't need new art.
