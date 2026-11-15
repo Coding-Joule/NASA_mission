@@ -38,7 +38,7 @@ They show in the "Problem!" popup. Square, about 256 × 256, transparent backgro
 
 | ✓ | File | What to draw | When it shows |
 |---|---|---|---|
-| ☐ | `disasters/asteroid.png` | An asteroid flying at you | Flight to Europa |
+| ✓ | `disasters/asteroid.png` | Done: cracked gray asteroid | Flight to Europa |
 | ✓ | `disasters/air-leak.jpg` | Done: crack with air swirling out | Any flight |
 | ☐ | `disasters/solar-flare.png` | The Sun blasting a flare | Any flight |
 | ✓ | `disasters/solar-panel.png` | Done: cracked solar panel | Any flight |
